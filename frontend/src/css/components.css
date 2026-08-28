@@ -9,6 +9,24 @@
 .site-header__register { text-decoration: none; }
 
 .post-list { display: grid; gap: var(--space-4); }
+.create-post-card { padding: var(--space-3) var(--space-4); border: 1px solid var(--color-line); border-radius: 12px; background: var(--color-surface); box-shadow: 0 8px 24px rgba(24, 35, 43, 0.06); }
+.create-post-card__trigger { display: flex; width: 100%; align-items: center; gap: var(--space-3); border: 0; padding: 0; color: var(--color-muted); background: transparent; text-align: left; }
+.create-post-card__trigger:hover { color: var(--color-ink); }
+.create-post-card__avatar { width: 40px; height: 40px; flex: 0 0 40px; border-radius: 50%; object-fit: cover; background: #e2e8f0; }
+.create-post-card__actions { display: flex; margin-top: var(--space-3); padding-top: var(--space-3); border-top: 1px solid var(--color-line); }
+.create-post-card__action { color: var(--color-accent-dark); font-size: 0.9rem; font-weight: 700; }
+.create-post-modal { position: fixed; inset: 0; z-index: 20; display: grid; place-items: center; padding: var(--space-3); background: rgba(24, 35, 43, 0.48); }
+.create-post-modal[hidden] { display: none; }
+.create-post-modal__panel { position: relative; width: min(100%, 560px); padding: var(--space-5); border: 1px solid var(--color-line); border-radius: 12px; background: var(--color-surface); box-shadow: 0 20px 60px rgba(24, 35, 43, 0.24); }
+.create-post-modal__panel h2 { margin: 0 0 var(--space-4); font: 700 1.5rem var(--font-display); }
+.create-post-modal__close { position: absolute; top: var(--space-3); right: var(--space-3); border: 0; padding: 0.35rem 0.55rem; color: var(--color-muted); background: transparent; font-weight: 700; }
+.create-post-modal__close:hover { color: var(--color-ink); }
+.create-post-modal form { display: grid; gap: var(--space-3); }
+.create-post-modal input, .create-post-modal textarea { width: 100%; border: 1px solid var(--color-line); border-radius: 8px; padding: 0.8rem 0.9rem; color: var(--color-ink); background: #fbfcfb; }
+.create-post-modal textarea { min-height: 8rem; resize: vertical; }
+.create-post-modal input:focus, .create-post-modal textarea:focus { border-color: var(--color-accent); outline: 3px solid var(--color-accent-soft); }
+.create-post-modal__submit { justify-self: end; border: 0; border-radius: 999px; padding: 0.65rem 1.2rem; color: white; background: var(--color-accent); font-weight: 700; }
+.create-post-modal__submit:hover { background: var(--color-accent-dark); }
 .post-card { overflow: hidden; padding: var(--space-4); border: 1px solid var(--color-line); border-radius: 12px; background: var(--color-surface); box-shadow: 0 8px 24px rgba(24, 35, 43, 0.06); transition: transform 180ms ease, box-shadow 180ms ease; }
 .post-card:hover, .post-card:focus-visible { transform: translateY(-3px); box-shadow: 0 14px 30px rgba(24, 35, 43, 0.12); outline: none; }
 .post-card__author { display: flex; align-items: center; gap: 12px; }

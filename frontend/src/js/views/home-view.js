@@ -1,8 +1,12 @@
 import { renderErrorState } from "/src/js/components/error-state.js"
+import { renderCreatePostCard } from "/src/js/components/create-post-card.js"
+import { renderCreatePostModal } from "/src/js/components/create-post-modal.js"
 import { renderLoadingState } from "/src/js/components/loading-state.js"
+import { renderPostCard } from "/src/js/components/post-card.js"
 import { renderInfiniteScroll } from "/src/js/components/pagination.js"
 import { renderPostList } from "/src/js/components/post-list.js"
 import postsService from "/src/js/services/posts-service.js"
+import authStore from "/src/js/store/auth-store.js"
 
 function messageFor(response) {
     return response?.error?.message || "Unable to load posts."
@@ -15,6 +19,16 @@ export function renderHomeView(container, { navigate, service = postsService } =
     let hasNextPage = true
     let list
     let infiniteScroll
+    let createPostCard
+    let createPostModal
+
+    if (authStore.isAuthenticated()) {
+        createPostModal = renderCreatePostModal({
+            service,
+            onSuccess: (post) => list?.prepend(renderPostCard(post, { onSelect: (item) => navigate(`/posts/${item.id}`) }))
+        })
+        createPostCard = renderCreatePostCard({ onOpen: () => createPostModal.open() })
+    }
 
     function getPageValue(value) {
         if (typeof value === "number" && Number.isInteger(value)) return value
@@ -35,11 +49,17 @@ export function renderHomeView(container, { navigate, service = postsService } =
 
     async function load() {
         const currentRequest = ++requestId
-        container.replaceChildren(renderLoadingState("Loading posts..."))
+        const loadingContent = document.createDocumentFragment()
+        if (createPostCard) loadingContent.append(createPostCard, createPostModal)
+        loadingContent.append(renderLoadingState("Loading posts..."))
+        container.replaceChildren(loadingContent)
         const response = await service.getPosts(page)
         if (!active || currentRequest !== requestId) return
         if (!response.ok) {
-            container.replaceChildren(renderErrorState(messageFor(response), { onRetry: load }))
+            const errorContent = document.createDocumentFragment()
+            if (createPostCard) errorContent.append(createPostCard, createPostModal)
+            errorContent.append(renderErrorState(messageFor(response), { onRetry: load }))
+            container.replaceChildren(errorContent)
             return
         }
 
@@ -48,6 +68,7 @@ export function renderHomeView(container, { navigate, service = postsService } =
         list = renderPostList(items, { onSelect: (post) => navigate(`/posts/${post.id}`) })
         infiniteScroll = renderInfiniteScroll({ onLoadMore: loadNextPage })
         const content = document.createDocumentFragment()
+        if (createPostCard) content.append(createPostCard, createPostModal)
         content.append(list, infiniteScroll)
         container.replaceChildren(content)
     }
