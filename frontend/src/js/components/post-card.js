@@ -258,7 +258,7 @@ export function renderPostCard(post = {}, { onSelect, onEdit, onDelete, isDetail
         })
 
         menu.append(editAction, deleteAction)
-        menuWrapper.append(menuButton, menu, confirmModal)
+        menuWrapper.append(menuButton, menu)
     }
 
     if (authorLink.href) authorInfo.append(authorLink)

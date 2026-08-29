@@ -69,7 +69,7 @@
 .comment p { margin: var(--space-1) 0 0; color: var(--color-muted); }
 .comment__delete { margin-top: var(--space-2); border: 0; padding: 0; color: var(--color-accent-dark); background: transparent; font-weight: 700; cursor: pointer; }
 .comment__delete:hover { text-decoration: underline; }
-.ui-confirm { position: fixed; inset: 0; z-index: 30; display: grid; place-items: center; padding: var(--space-3); background: rgba(24, 35, 43, 0.48); }
+.ui-confirm { position: fixed; inset: 0; z-index: 9999; display: flex; align-items: center; justify-content: center; padding: var(--space-3); background: rgba(24, 35, 43, 0.48); }
 .ui-confirm[hidden] { display: none; }
 .ui-confirm__panel { width: min(100%, 420px); padding: var(--space-5); border: 1px solid var(--color-line); border-radius: 12px; background: var(--color-surface); box-shadow: 0 20px 60px rgba(24, 35, 43, 0.24); }
 .ui-confirm__panel h2 { margin: 0 0 var(--space-2); font: 700 1.35rem var(--font-display); }

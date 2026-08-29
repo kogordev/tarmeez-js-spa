@@ -93,7 +93,7 @@ export function renderPostDetailView(container, { postId, service = postsService
                 confirmModal.decrement = decrement
                 confirmModal.open()
             }
-        }), confirmModal)
+        }))
         if (store.isAuthenticated()) {
             const form = document.createElement("form")
             const input = document.createElement("textarea")

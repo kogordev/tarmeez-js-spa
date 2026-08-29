@@ -13,9 +13,25 @@ export function renderConfirmModal({
     const cancel = document.createElement("button")
     const confirm = document.createElement("button")
 
+    function ensureMounted() {
+        if (typeof document === "undefined") {
+            return
+        }
+        if (!document.body) {
+            return
+        }
+        if (modal.parentNode !== document.body) {
+            if (modal.parentNode) {
+                modal.remove()
+            }
+            document.body.appendChild(modal)
+        }
+    }
+
     modal.className = "ui-confirm"
     modal.hidden = true
     modal.setAttribute("aria-hidden", "true")
+    ensureMounted()
 
     panel.className = "ui-confirm__panel"
     panel.setAttribute("role", "dialog")
@@ -47,6 +63,7 @@ export function renderConfirmModal({
     }
 
     function open() {
+        ensureMounted()
         modal.hidden = false
         modal.setAttribute("aria-hidden", "false")
         cancel.focus()
