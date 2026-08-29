@@ -79,6 +79,7 @@ export function renderConfirmModal({
 
     confirm.addEventListener("click", async () => {
         confirm.disabled = true
+        close()
         try {
             await onConfirm({
                 close,
@@ -87,7 +88,8 @@ export function renderConfirmModal({
                 },
             })
         } catch {
-            confirm.disabled = false
+        } finally {
+            close()
         }
     })
 

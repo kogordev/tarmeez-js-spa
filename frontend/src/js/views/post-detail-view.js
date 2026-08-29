@@ -54,7 +54,7 @@ export function renderPostDetailView(container, { postId, service = postsService
     })
     const confirmModal = renderConfirmModal({
         onConfirm: async ({ close, fail }) => {
-            const response = await commentService.deleteComment(postId, confirmModal.commentId)
+            const response = await commentService.deleteComment(confirmModal.commentId)
             if (!response.ok) {
                 fail()
                 return
