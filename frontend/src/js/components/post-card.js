@@ -1,5 +1,6 @@
 import escapeHtml from "/src/js/utils/escape-html.js"
 import authStore from "/src/js/store/auth-store.js"
+import { deletePost } from "/src/js/services/posts-service.js"
 import { DEFAULT_AVATAR_FALLBACK, getImageUrl, hasValidImage, setImageFallback } from "/src/js/utils/images.js"
 
 function setSafeText(element, value) {
@@ -200,11 +201,28 @@ export function renderPostCard(post = {}, { onSelect, isDetailView = false } = {
             alert(`Edit post clicked: ${post.id}`)
         })
 
-        deleteAction.addEventListener("click", (event) => {
+        deleteAction.addEventListener("click", async (event) => {
             event.preventDefault()
             event.stopPropagation()
+
+            if (!post?.id) {
+                return
+            }
+
+            if (!window.confirm("Are you sure you want to delete this post?")) {
+                closeMenu()
+                return
+            }
+
             closeMenu()
-            alert(`Delete post clicked: ${post.id}`)
+
+            const response = await deletePost(post.id)
+            if (!response?.ok) {
+                window.alert(response?.error?.message || "Unable to delete this post.")
+                return
+            }
+
+            article.remove()
         })
 
         menuButton.addEventListener("click", (event) => {
