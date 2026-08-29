@@ -77,7 +77,7 @@ export function renderPostDetailView(container, { postId, service = postsService
         onConfirm: async ({ close, fail }) => {
             let response
             try {
-                response = await commentService.deleteComment(confirmModal.commentId)
+                response = await commentService.deleteComment(postId, confirmModal.commentId)
             } catch (error) {
                 fail()
                 showToast(error.message || "Unable to delete comment.")
