@@ -3,6 +3,8 @@ import authStore from "/src/js/store/auth-store.js"
 import { deletePost } from "/src/js/services/posts-service.js"
 import { DEFAULT_AVATAR_FALLBACK, getImageUrl, hasValidImage, setImageFallback } from "/src/js/utils/images.js"
 
+let activeMenuClose = null
+
 function setSafeText(element, value) {
     element.innerHTML = escapeHtml(value)
 }
@@ -147,6 +149,9 @@ export function renderPostCard(post = {}, { onSelect, onEdit, isDetailView = fal
         const closeMenu = () => {
             menu.hidden = true
             menuButton.setAttribute("aria-expanded", "false")
+            if (activeMenuClose === closeMenu) {
+                activeMenuClose = null
+            }
         }
 
         menuButton.type = "button"
@@ -234,8 +239,10 @@ export function renderPostCard(post = {}, { onSelect, onEdit, isDetailView = fal
                 return
             }
 
+            activeMenuClose?.()
             menu.hidden = false
             menuButton.setAttribute("aria-expanded", "true")
+            activeMenuClose = closeMenu
         })
 
         document.addEventListener("click", (event) => {

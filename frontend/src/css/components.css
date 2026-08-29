@@ -44,6 +44,7 @@
 .post-card__footer { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); margin-top: var(--space-4); color: var(--color-muted); font-size: 0.85rem; }
 .post-card__detail-link { color: var(--color-accent-dark); font-weight: 700; text-decoration: none; }
 .post-card__detail-link:hover { text-decoration: underline; }
+.post-card__menu[hidden] { display: none !important; }
 
 .infinite-scroll { min-height: 4rem; text-align: center; }
 .infinite-scroll__sentinel { height: 1px; }
