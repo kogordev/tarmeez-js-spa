@@ -44,8 +44,13 @@ export async function createPost(input) {
 }
 
 export async function updatePost(postId, input) {
+    const formData = input instanceof FormData ? input : toFormData(input)
+    if (!formData.has("_method")) {
+        formData.append("_method", "PUT")
+    }
+
     return normalizeDataResponse(
-        await httpClient.put(`/posts/${encodeURIComponent(postId)}`, toFormData(input)),
+        await httpClient.post(`/posts/${encodeURIComponent(postId)}`, formData),
         normalizePost
     )
 }

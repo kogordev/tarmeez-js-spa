@@ -49,12 +49,30 @@ export function renderCreatePostModal({ service = postsService, onSuccess, onClo
     submit.className = "create-post-modal__submit"
     submit.textContent = "Post"
 
+    function showToast(message) {
+        const toast = document.createElement("div")
+        toast.textContent = message
+        toast.style.position = "fixed"
+        toast.style.right = "24px"
+        toast.style.bottom = "24px"
+        toast.style.zIndex = "9999"
+        toast.style.background = "#111827"
+        toast.style.color = "#fff"
+        toast.style.padding = "12px 16px"
+        toast.style.borderRadius = "999px"
+        toast.style.boxShadow = "0 12px 30px rgba(15, 23, 42, 0.2)"
+        toast.style.fontSize = "0.9rem"
+        document.body.appendChild(toast)
+        window.setTimeout(() => toast.remove(), 2200)
+    }
+
     function closeModal() {
         modal.hidden = true
         modal.setAttribute("aria-hidden", "true")
         form.reset()
         error.hidden = true
         error.textContent = ""
+        imageFile.value = ""
         editingPost = null
         onClose?.()
     }
@@ -69,7 +87,7 @@ export function renderCreatePostModal({ service = postsService, onSuccess, onClo
         body.value = editingPost?.body || ""
         imageUrl.value = editingPost?.imageUrl || ""
         imageUrl.hidden = Boolean(editingPost)
-        imageFile.hidden = Boolean(editingPost)
+        imageFile.value = ""
         title.focus()
     }
 
@@ -81,18 +99,27 @@ export function renderCreatePostModal({ service = postsService, onSuccess, onClo
         event.preventDefault()
         submit.disabled = true
         error.hidden = true
-        const selectedFile = imageFile.files[0]
+        const selectedFile = imageFile.files?.[0]
         const input = {
             title: title.value.trim(),
             body: body.value.trim()
         }
-        if (!editingPost) input.image = selectedFile || imageUrl.value.trim()
+
+        if (editingPost) {
+            if (selectedFile) {
+                input.image = selectedFile
+            }
+        } else {
+            input.image = selectedFile || imageUrl.value.trim()
+        }
+
         const response = editingPost
             ? await service.updatePost(editingPost.id, input)
             : await service.createPost(input)
         if (response.ok) {
-            onSuccess?.(response.data)
             closeModal()
+            showToast(editingPost ? "Post updated successfully." : "Post published successfully.")
+            onSuccess?.(response.data)
         } else {
             error.textContent = messageFor(response)
             error.hidden = false
