@@ -29,7 +29,7 @@ function getAuthorLabel(author) {
     return author?.name || author?.username || "Unknown author"
 }
 
-export function renderPostCard(post = {}, { onSelect, onEdit, isDetailView = false } = {}) {
+export function renderPostCard(post = {}, { onSelect, onEdit, onDelete, isDetailView = false } = {}) {
     const article = document.createElement("article")
     const author = post.author || {}
     let currentUser = authStore.getUser ? authStore.getUser() : null
@@ -228,6 +228,7 @@ export function renderPostCard(post = {}, { onSelect, onEdit, isDetailView = fal
             }
 
             article.remove()
+            onDelete?.(post)
         })
 
         menuButton.addEventListener("click", (event) => {

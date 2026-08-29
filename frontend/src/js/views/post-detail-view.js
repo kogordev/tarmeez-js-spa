@@ -25,7 +25,7 @@ function renderComments(comments = []) {
     return section
 }
 
-export function renderPostDetailView(container, { postId, service = postsService, commentService = commentsService, store = authStore } = {}) {
+export function renderPostDetailView(container, { postId, service = postsService, commentService = commentsService, store = authStore, navigate } = {}) {
     let active = true
     let requestId = 0
     let post
@@ -51,7 +51,8 @@ export function renderPostDetailView(container, { postId, service = postsService
         const content = document.createDocumentFragment()
         content.append(renderPostCard(post, {
             isDetailView: true,
-            onEdit: (item) => editModal.open(item)
+            onEdit: (item) => editModal.open(item),
+            onDelete: () => navigate?.("/")
         }), editModal)
         content.append(renderComments(post.comments || []))
         if (store.isAuthenticated()) {
