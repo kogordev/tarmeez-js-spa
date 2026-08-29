@@ -10,6 +10,27 @@ import escapeHtml from "/src/js/utils/escape-html.js"
 
 function messageFor(response) { return response?.error?.message || "Unable to load this post." }
 
+function showToast(message) {
+    const toast = document.createElement("div")
+    toast.textContent = message
+    toast.setAttribute("role", "alert")
+    toast.style.position = "fixed"
+    toast.style.right = "24px"
+    toast.style.bottom = "24px"
+    toast.style.zIndex = "9999"
+    toast.style.background = "#111827"
+    toast.style.color = "#fff"
+    toast.style.padding = "12px 16px"
+    toast.style.borderRadius = "8px"
+    toast.style.boxShadow = "0 12px 30px rgba(15, 23, 42, 0.2)"
+    document.body.appendChild(toast)
+    window.setTimeout(() => toast.remove(), 3000)
+}
+
+function isSuccessful(response) {
+    return response?.ok === true || [200, 204].includes(response?.status)
+}
+
 function sameUser(firstUser, secondUser) {
     const firstId = firstUser?.id ?? firstUser?.userId ?? firstUser?._id
     const secondId = secondUser?.id ?? secondUser?.userId ?? secondUser?._id
@@ -54,9 +75,17 @@ export function renderPostDetailView(container, { postId, service = postsService
     })
     const confirmModal = renderConfirmModal({
         onConfirm: async ({ close, fail }) => {
-            const response = await commentService.deleteComment(confirmModal.commentId)
-            if (!response.ok) {
+            let response
+            try {
+                response = await commentService.deleteComment(confirmModal.commentId)
+            } catch (error) {
                 fail()
+                showToast(error.message || "Unable to delete comment.")
+                return
+            }
+            if (!isSuccessful(response)) {
+                fail()
+                showToast(response?.error?.message || `Unable to delete comment${response?.status ? ` (${response.status})` : "."}`)
                 return
             }
             confirmModal.commentItem.remove()

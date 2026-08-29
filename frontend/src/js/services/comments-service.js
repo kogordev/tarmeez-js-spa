@@ -10,7 +10,9 @@ export async function createComment(postId, body) {
 }
 
 export async function deleteComment(commentId) {
-    return httpClient.delete(`/comments/${encodeURIComponent(commentId)}`)
+    const response = await httpClient.delete(`/comments/${encodeURIComponent(commentId)}`)
+    console.log("DELETE /comments response", { status: response.status, data: response.data })
+    return response
 }
 
 export const commentsService = { createComment, deleteComment }
