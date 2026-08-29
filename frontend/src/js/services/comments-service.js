@@ -9,7 +9,7 @@ export async function createComment(postId, body) {
     )
 }
 
-export async function deleteComment(commentId) {
+export async function deleteComment(postId, commentId = postId) {
     return httpClient.delete(`/comments/${encodeURIComponent(commentId)}`)
 }
 
