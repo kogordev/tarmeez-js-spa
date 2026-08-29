@@ -2,6 +2,7 @@ import { renderErrorState } from "/src/js/components/error-state.js"
 import { renderLoadingState } from "/src/js/components/loading-state.js"
 import { renderPostCard } from "/src/js/components/post-card.js"
 import { renderCreatePostModal } from "/src/js/components/create-post-modal.js"
+import { renderConfirmModal } from "/src/js/components/confirm-modal.js"
 import authStore from "/src/js/store/auth-store.js"
 import commentsService from "/src/js/services/comments-service.js"
 import postsService from "/src/js/services/posts-service.js"
@@ -13,61 +14,6 @@ function sameUser(firstUser, secondUser) {
     const firstId = firstUser?.id ?? firstUser?.userId ?? firstUser?._id
     const secondId = secondUser?.id ?? secondUser?.userId ?? secondUser?._id
     return firstId != null && secondId != null && String(firstId) === String(secondId)
-}
-
-function renderConfirmModal({ onConfirm }) {
-    const modal = document.createElement("div")
-    const panel = document.createElement("section")
-    const heading = document.createElement("h2")
-    const message = document.createElement("p")
-    const actions = document.createElement("div")
-    const cancel = document.createElement("button")
-    const confirm = document.createElement("button")
-
-    modal.className = "ui-confirm"
-    modal.hidden = true
-    modal.setAttribute("aria-hidden", "true")
-    panel.className = "ui-confirm__panel"
-    panel.setAttribute("role", "dialog")
-    panel.setAttribute("aria-modal", "true")
-    panel.setAttribute("aria-labelledby", "ui-confirm-title")
-    heading.id = "ui-confirm-title"
-    heading.textContent = "Delete comment?"
-    message.textContent = "This action cannot be undone."
-    actions.className = "ui-confirm__actions"
-    cancel.type = "button"
-    cancel.className = "ui-confirm__cancel"
-    cancel.textContent = "Cancel"
-    confirm.type = "button"
-    confirm.className = "ui-confirm__confirm"
-    confirm.textContent = "Delete"
-    actions.append(cancel, confirm)
-    panel.append(heading, message, actions)
-    modal.append(panel)
-
-    function close() {
-        modal.hidden = true
-        modal.setAttribute("aria-hidden", "true")
-        confirm.disabled = false
-    }
-
-    function open() {
-        modal.hidden = false
-        modal.setAttribute("aria-hidden", "false")
-        cancel.focus()
-    }
-
-    cancel.addEventListener("click", close)
-    modal.addEventListener("click", (event) => {
-        if (event.target === modal) close()
-    })
-    confirm.addEventListener("click", async () => {
-        confirm.disabled = true
-        await onConfirm({ close, fail: () => { confirm.disabled = false } })
-    })
-    modal.open = open
-    modal.close = close
-    return modal
 }
 
 function renderComments(comments = [], { currentUser, onDelete } = {}) {

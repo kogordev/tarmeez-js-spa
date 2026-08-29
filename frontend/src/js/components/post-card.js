@@ -2,6 +2,7 @@ import escapeHtml from "/src/js/utils/escape-html.js"
 import authStore from "/src/js/store/auth-store.js"
 import { deletePost } from "/src/js/services/posts-service.js"
 import { DEFAULT_AVATAR_FALLBACK, getImageUrl, hasValidImage, setImageFallback } from "/src/js/utils/images.js"
+import { renderConfirmModal } from "/src/js/components/confirm-modal.js"
 
 let activeMenuClose = null
 
@@ -145,6 +146,22 @@ export function renderPostCard(post = {}, { onSelect, onEdit, onDelete, isDetail
         const menu = document.createElement("div")
         const editAction = document.createElement("button")
         const deleteAction = document.createElement("button")
+        const confirmModal = renderConfirmModal({
+            title: "Delete post?",
+            message: "This post and its comments will be removed permanently.",
+            onConfirm: async ({ close, fail }) => {
+                const response = await deletePost(post.id)
+                if (!response?.ok) {
+                    confirmModal.setMessage(response?.error?.message || "Unable to delete this post.")
+                    fail()
+                    return
+                }
+
+                article.remove()
+                onDelete?.(post)
+                close()
+            }
+        })
 
         const closeMenu = () => {
             menu.hidden = true
@@ -206,7 +223,7 @@ export function renderPostCard(post = {}, { onSelect, onEdit, onDelete, isDetail
             onEdit?.(post)
         })
 
-        deleteAction.addEventListener("click", async (event) => {
+        deleteAction.addEventListener("click", (event) => {
             event.preventDefault()
             event.stopPropagation()
 
@@ -214,21 +231,9 @@ export function renderPostCard(post = {}, { onSelect, onEdit, onDelete, isDetail
                 return
             }
 
-            if (!window.confirm("Are you sure you want to delete this post?")) {
-                closeMenu()
-                return
-            }
-
             closeMenu()
-
-            const response = await deletePost(post.id)
-            if (!response?.ok) {
-                window.alert(response?.error?.message || "Unable to delete this post.")
-                return
-            }
-
-            article.remove()
-            onDelete?.(post)
+            confirmModal.setMessage("This post and its comments will be removed permanently.")
+            confirmModal.open()
         })
 
         menuButton.addEventListener("click", (event) => {
@@ -253,7 +258,7 @@ export function renderPostCard(post = {}, { onSelect, onEdit, onDelete, isDetail
         })
 
         menu.append(editAction, deleteAction)
-        menuWrapper.append(menuButton, menu)
+        menuWrapper.append(menuButton, menu, confirmModal)
     }
 
     if (authorLink.href) authorInfo.append(authorLink)
