@@ -47,7 +47,17 @@ export function renderCreatePostModal({ service = postsService, onSuccess, onClo
     error.hidden = true
     submit.type = "submit"
     submit.className = "create-post-modal__submit"
-    submit.textContent = "Post"
+    submit.textContent = "Create"
+
+    function resetSubmitState(clearError = true) {
+        submit.disabled = false
+        submit.classList.remove("loading", "is-loading")
+        submit.textContent = editingPost ? "Save changes" : "Create"
+        if (clearError) {
+            error.hidden = true
+            error.textContent = ""
+        }
+    }
 
     function showToast(message) {
         const toast = document.createElement("div")
@@ -82,7 +92,7 @@ export function renderCreatePostModal({ service = postsService, onSuccess, onClo
         modal.hidden = false
         modal.setAttribute("aria-hidden", "false")
         heading.textContent = editingPost ? "Edit post" : "Create post"
-        submit.textContent = editingPost ? "Save changes" : "Post"
+        resetSubmitState()
         title.value = editingPost?.title || ""
         body.value = editingPost?.body || ""
         imageUrl.value = editingPost?.imageUrl || ""
@@ -113,17 +123,24 @@ export function renderCreatePostModal({ service = postsService, onSuccess, onClo
             input.image = selectedFile || imageUrl.value.trim()
         }
 
-        const response = editingPost
-            ? await service.updatePost(editingPost.id, input)
-            : await service.createPost(input)
-        if (response.ok) {
-            closeModal()
-            showToast(editingPost ? "Post updated successfully." : "Post published successfully.")
-            onSuccess?.(response.data)
-        } else {
-            error.textContent = messageFor(response)
+        try {
+            const response = editingPost
+                ? await service.updatePost(editingPost.id, input)
+                : await service.createPost(input)
+            if (response.ok) {
+                const wasEditing = Boolean(editingPost)
+                closeModal()
+                showToast(wasEditing ? "Post updated successfully." : "Post published successfully.")
+                onSuccess?.(response.data)
+            } else {
+                resetSubmitState(false)
+                error.textContent = messageFor(response)
+                error.hidden = false
+            }
+        } catch (requestError) {
+            resetSubmitState(false)
+            error.textContent = requestError?.message || "Unable to publish your post."
             error.hidden = false
-            submit.disabled = false
         }
     })
 
