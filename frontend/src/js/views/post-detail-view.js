@@ -9,17 +9,90 @@ import escapeHtml from "/src/js/utils/escape-html.js"
 
 function messageFor(response) { return response?.error?.message || "Unable to load this post." }
 
-function renderComments(comments = []) {
+function sameUser(firstUser, secondUser) {
+    const firstId = firstUser?.id ?? firstUser?.userId ?? firstUser?._id
+    const secondId = secondUser?.id ?? secondUser?.userId ?? secondUser?._id
+    return firstId != null && secondId != null && String(firstId) === String(secondId)
+}
+
+function renderConfirmModal({ onConfirm }) {
+    const modal = document.createElement("div")
+    const panel = document.createElement("section")
+    const heading = document.createElement("h2")
+    const message = document.createElement("p")
+    const actions = document.createElement("div")
+    const cancel = document.createElement("button")
+    const confirm = document.createElement("button")
+
+    modal.className = "ui-confirm"
+    modal.hidden = true
+    modal.setAttribute("aria-hidden", "true")
+    panel.className = "ui-confirm__panel"
+    panel.setAttribute("role", "dialog")
+    panel.setAttribute("aria-modal", "true")
+    panel.setAttribute("aria-labelledby", "ui-confirm-title")
+    heading.id = "ui-confirm-title"
+    heading.textContent = "Delete comment?"
+    message.textContent = "This action cannot be undone."
+    actions.className = "ui-confirm__actions"
+    cancel.type = "button"
+    cancel.className = "ui-confirm__cancel"
+    cancel.textContent = "Cancel"
+    confirm.type = "button"
+    confirm.className = "ui-confirm__confirm"
+    confirm.textContent = "Delete"
+    actions.append(cancel, confirm)
+    panel.append(heading, message, actions)
+    modal.append(panel)
+
+    function close() {
+        modal.hidden = true
+        modal.setAttribute("aria-hidden", "true")
+        confirm.disabled = false
+    }
+
+    function open() {
+        modal.hidden = false
+        modal.setAttribute("aria-hidden", "false")
+        cancel.focus()
+    }
+
+    cancel.addEventListener("click", close)
+    modal.addEventListener("click", (event) => {
+        if (event.target === modal) close()
+    })
+    confirm.addEventListener("click", async () => {
+        confirm.disabled = true
+        await onConfirm({ close, fail: () => { confirm.disabled = false } })
+    })
+    modal.open = open
+    modal.close = close
+    return modal
+}
+
+function renderComments(comments = [], { currentUser, onDelete } = {}) {
     const section = document.createElement("section")
     section.className = "comments"
     const heading = document.createElement("h2")
-    heading.textContent = `Comments (${comments.length})`
+    let commentCount = comments.length
+    heading.textContent = `Comments (${commentCount})`
     section.append(heading)
     comments.forEach((comment) => {
         const item = document.createElement("article")
         item.className = "comment"
         const author = comment.author?.name || comment.author?.username || "Anonymous"
         item.innerHTML = `<strong>${escapeHtml(author)}</strong><p>${escapeHtml(comment.body)}</p>`
+        if (sameUser(comment.author, currentUser)) {
+            const deleteButton = document.createElement("button")
+            deleteButton.type = "button"
+            deleteButton.className = "comment__delete"
+            deleteButton.textContent = "Delete"
+            deleteButton.addEventListener("click", () => onDelete?.({ comment, item, decrement: () => {
+                commentCount = Math.max(0, commentCount - 1)
+                heading.textContent = `Comments (${commentCount})`
+            } }))
+            item.append(deleteButton)
+        }
         section.append(item)
     })
     return section
@@ -32,6 +105,18 @@ export function renderPostDetailView(container, { postId, service = postsService
     const editModal = renderCreatePostModal({
         service,
         onSuccess: () => load()
+    })
+    const confirmModal = renderConfirmModal({
+        onConfirm: async ({ close, fail }) => {
+            const response = await commentService.deleteComment(postId, confirmModal.commentId)
+            if (!response.ok) {
+                fail()
+                return
+            }
+            confirmModal.commentItem.remove()
+            confirmModal.decrement()
+            close()
+        }
     })
 
     async function load() {
@@ -54,7 +139,15 @@ export function renderPostDetailView(container, { postId, service = postsService
             onEdit: (item) => editModal.open(item),
             onDelete: () => navigate?.("/")
         }), editModal)
-        content.append(renderComments(post.comments || []))
+        content.append(renderComments(post.comments || [], {
+            currentUser: store.getUser(),
+            onDelete: ({ comment, item, decrement }) => {
+                confirmModal.commentId = comment.id
+                confirmModal.commentItem = item
+                confirmModal.decrement = decrement
+                confirmModal.open()
+            }
+        }), confirmModal)
         if (store.isAuthenticated()) {
             const form = document.createElement("form")
             const input = document.createElement("textarea")
@@ -88,7 +181,11 @@ export function renderPostDetailView(container, { postId, service = postsService
     }
 
     load()
-    return () => { active = false; requestId += 1 }
+    return () => {
+        active = false
+        requestId += 1
+        confirmModal.remove()
+    }
 }
 
 export default renderPostDetailView
