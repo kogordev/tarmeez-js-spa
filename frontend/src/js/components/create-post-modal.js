@@ -15,6 +15,7 @@ export function renderCreatePostModal({ service = postsService, onSuccess, onClo
     const imageFile = document.createElement("input")
     const error = document.createElement("p")
     const submit = document.createElement("button")
+    let editingPost = null
 
     modal.className = "create-post-modal"
     modal.hidden = true
@@ -54,12 +55,21 @@ export function renderCreatePostModal({ service = postsService, onSuccess, onClo
         form.reset()
         error.hidden = true
         error.textContent = ""
+        editingPost = null
         onClose?.()
     }
 
-    function openModal() {
+    function openModal(post = null) {
+        editingPost = post
         modal.hidden = false
         modal.setAttribute("aria-hidden", "false")
+        heading.textContent = editingPost ? "Edit post" : "Create post"
+        submit.textContent = editingPost ? "Save changes" : "Post"
+        title.value = editingPost?.title || ""
+        body.value = editingPost?.body || ""
+        imageUrl.value = editingPost?.imageUrl || ""
+        imageUrl.hidden = Boolean(editingPost)
+        imageFile.hidden = Boolean(editingPost)
         title.focus()
     }
 
@@ -72,11 +82,14 @@ export function renderCreatePostModal({ service = postsService, onSuccess, onClo
         submit.disabled = true
         error.hidden = true
         const selectedFile = imageFile.files[0]
-        const response = await service.createPost({
+        const input = {
             title: title.value.trim(),
-            body: body.value.trim(),
-            image: selectedFile || imageUrl.value.trim()
-        })
+            body: body.value.trim()
+        }
+        if (!editingPost) input.image = selectedFile || imageUrl.value.trim()
+        const response = editingPost
+            ? await service.updatePost(editingPost.id, input)
+            : await service.createPost(input)
         if (response.ok) {
             onSuccess?.(response.data)
             closeModal()

@@ -1,6 +1,7 @@
 import { renderErrorState } from "/src/js/components/error-state.js"
 import { renderLoadingState } from "/src/js/components/loading-state.js"
 import { renderPostCard } from "/src/js/components/post-card.js"
+import { renderCreatePostModal } from "/src/js/components/create-post-modal.js"
 import authStore from "/src/js/store/auth-store.js"
 import commentsService from "/src/js/services/comments-service.js"
 import postsService from "/src/js/services/posts-service.js"
@@ -28,6 +29,10 @@ export function renderPostDetailView(container, { postId, service = postsService
     let active = true
     let requestId = 0
     let post
+    const editModal = renderCreatePostModal({
+        service,
+        onSuccess: () => load()
+    })
 
     async function load() {
         const currentRequest = ++requestId
@@ -44,7 +49,10 @@ export function renderPostDetailView(container, { postId, service = postsService
 
     function render() {
         const content = document.createDocumentFragment()
-        content.append(renderPostCard(post, { isDetailView: true }))
+        content.append(renderPostCard(post, {
+            isDetailView: true,
+            onEdit: (item) => editModal.open(item)
+        }), editModal)
         content.append(renderComments(post.comments || []))
         if (store.isAuthenticated()) {
             const form = document.createElement("form")

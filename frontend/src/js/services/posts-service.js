@@ -43,9 +43,16 @@ export async function createPost(input) {
     return normalizeDataResponse(await httpClient.post("/posts", toFormData(input)), normalizePost)
 }
 
+export async function updatePost(postId, input) {
+    return normalizeDataResponse(
+        await httpClient.put(`/posts/${encodeURIComponent(postId)}`, toFormData(input)),
+        normalizePost
+    )
+}
+
 export async function deletePost(postId) {
     return httpClient.delete(`/posts/${encodeURIComponent(postId)}`)
 }
 
-export const postsService = { getPosts, getUserPosts, getPost, createPost, deletePost }
+export const postsService = { getPosts, getUserPosts, getPost, createPost, updatePost, deletePost }
 export default postsService
