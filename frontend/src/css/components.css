@@ -8,7 +8,7 @@
 .site-header__action:hover, .auth-form button:hover, .comment-form button:hover, .error-state__retry:hover { background: var(--color-accent-dark); transform: translateY(-1px); }
 .site-header__register { text-decoration: none; }
 
-.post-list { display: grid; gap: var(--space-4); }
+.post-list { display: grid; gap: 1.5rem; }
 .create-post-card { padding: var(--space-3) var(--space-4); border: 1px solid var(--color-line); border-radius: 12px; background: var(--color-surface); box-shadow: 0 8px 24px rgba(24, 35, 43, 0.06); }
 .create-post-card__trigger { display: flex; width: 100%; align-items: center; gap: var(--space-3); border: 0; padding: 0; color: var(--color-muted); background: transparent; text-align: left; }
 .create-post-card__trigger:hover { color: var(--color-ink); }
@@ -27,8 +27,8 @@
 .create-post-modal input:focus, .create-post-modal textarea:focus { border-color: var(--color-accent); outline: 3px solid var(--color-accent-soft); }
 .create-post-modal__submit { justify-self: end; border: 0; border-radius: 999px; padding: 0.65rem 1.2rem; color: white; background: var(--color-accent); font-weight: 700; }
 .create-post-modal__submit:hover { background: var(--color-accent-dark); }
-.post-card { overflow: hidden; padding: var(--space-4); border: 1px solid var(--color-line); border-radius: 12px; background: var(--color-surface); box-shadow: 0 8px 24px rgba(24, 35, 43, 0.06); transition: transform 180ms ease, box-shadow 180ms ease; }
-.post-card:hover, .post-card:focus-visible { transform: translateY(-3px); box-shadow: 0 14px 30px rgba(24, 35, 43, 0.12); outline: none; }
+.post-card { overflow: hidden; margin-bottom: 1.5rem; padding: var(--space-4); border: 1px solid var(--color-line); border-radius: 12px; background: var(--color-surface); box-shadow: 0 8px 24px rgba(24, 35, 43, 0.06); transition: transform 180ms ease, box-shadow 180ms ease; }
+.post-card:hover, .post-card:focus-visible { transform: translateY(-2px); box-shadow: 0 12px 28px rgba(24, 35, 43, 0.12); outline: none; }
 .post-card__author { display: flex; align-items: center; gap: 12px; }
 .post-card__author-link { display: flex; align-items: center; gap: 12px; min-width: 0; }
 .post-card__author-image { display: inline-block; width: 40px; height: 40px; flex: 0 0 40px; flex-shrink: 0; border-radius: 50%; object-fit: cover; background-color: #e2e8f0; }
