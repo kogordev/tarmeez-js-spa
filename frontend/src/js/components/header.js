@@ -62,6 +62,29 @@ export function renderHeader({ store = authStore, onLogin, onLogout, onNavigate 
     emailIcon.appendChild(emailPath)
     emailLink.appendChild(emailIcon)
 
+    emailLink.addEventListener("click", () => {
+        const copyPromise = navigator.clipboard?.writeText("kogordev@gmail.com")
+        if (!copyPromise) return
+
+        copyPromise.then(() => {
+            const existingToast = document.body.querySelector(".tarmeez-toast")
+            if (existingToast) existingToast.remove()
+
+            const toast = document.createElement("div")
+            toast.className = "tarmeez-toast"
+            toast.textContent = "Email copied to clipboard!"
+            toast.style.position = "fixed"
+            toast.style.right = "24px"
+            toast.style.bottom = "24px"
+            toast.style.zIndex = "9999"
+            toast.style.padding = "12px 16px"
+            toast.style.borderRadius = "999px"
+            toast.style.fontSize = "0.9rem"
+            document.body.appendChild(toast)
+            window.setTimeout(() => toast.remove(), 2200)
+        }).catch(() => {})
+    })
+
     action.type = "button"
     action.className = "site-header__action"
     registerLink.className = "site-header__action site-header__register"
