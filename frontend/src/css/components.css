@@ -8,17 +8,14 @@
 .site-header__action:hover, .auth-form button:hover, .comment-form button:hover, .error-state__retry:hover { background: var(--color-accent-dark); transform: translateY(-1px); }
 .site-header__register { text-decoration: none; }
 
-[dir="auto"] {
+[dir="auto"],
+.post-card__title[dir="auto"],
+.post-card__body[dir="auto"],
+.comment__content[dir="auto"],
+textarea[dir="auto"],
+input[dir="auto"] {
+    text-align: start !important;
     unicode-bidi: plaintext;
-    text-align: initial;
-}
-
-[dir="auto"]:dir(rtl) {
-    text-align: right;
-}
-
-[dir="auto"]:dir(ltr) {
-    text-align: left;
 }
 
 .post-list { display: grid; gap: 1.5rem; }
