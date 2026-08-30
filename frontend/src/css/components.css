@@ -8,11 +8,22 @@
 .site-header__action:hover, .auth-form button:hover, .comment-form button:hover, .error-state__retry:hover { background: var(--color-accent-dark); transform: translateY(-1px); }
 .site-header__register { text-decoration: none; }
 
-[dir="auto"] { text-align: start; unicode-bidi: plaintext; }
+[dir="auto"] {
+    unicode-bidi: plaintext;
+    text-align: initial;
+}
+
+[dir="auto"]:dir(rtl) {
+    text-align: right;
+}
+
+[dir="auto"]:dir(ltr) {
+    text-align: left;
+}
 
 .post-list { display: grid; gap: 1.5rem; }
 .create-post-card { margin-bottom: 1.5rem; padding: var(--space-3) var(--space-4); border: 1px solid var(--color-line); border-radius: 12px; background: var(--color-surface); box-shadow: 0 8px 24px rgba(24, 35, 43, 0.06); }
-.create-post-card__trigger { display: flex; width: 100%; align-items: center; gap: var(--space-3); border: 0; padding: 0; color: var(--color-muted); background: transparent; text-align: left; }
+.create-post-card__trigger { display: flex; width: 100%; align-items: center; gap: var(--space-3); border: 0; padding: 0; color: var(--color-muted); background: transparent; }
 .create-post-card__trigger:hover { color: var(--color-ink); }
 .create-post-card__avatar { width: 40px; height: 40px; flex: 0 0 40px; border-radius: 50%; object-fit: cover; background: #e2e8f0; }
 .create-post-card__actions { display: flex; margin-top: var(--space-3); padding-top: var(--space-3); border-top: 1px solid var(--color-line); }
@@ -39,7 +50,7 @@
 .post-card__title { margin: 0 0 var(--space-2); font: 700 1.45rem/1.2 var(--font-display); }
 .post-card__title a { color: inherit; text-decoration: none; }
 .post-card__title a:hover { color: var(--color-accent-dark); }
-.post-card__body { margin: 0; color: #42515a; line-height: 1.65; white-space: pre-line; }
+.post-card__body { margin: 0; color: #42515a; line-height: 1.65; white-space: pre-line; text-align: inherit; }
 .post-card__image { display: block; width: 100%; max-height: 360px; margin: var(--space-4) 0; border-radius: 8px; object-fit: cover; }
 .post-card__tags { display: flex; flex-wrap: wrap; gap: var(--space-1); padding: 0; margin: var(--space-3) 0 0; list-style: none; }
 .post-card__tag { padding: 0.3rem 0.65rem; border-radius: 999px; color: var(--color-accent-dark); background: var(--color-accent-soft); font-size: 0.78rem; font-weight: 700; }
