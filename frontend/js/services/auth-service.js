@@ -38,9 +38,9 @@ export async function login(credentials) {
 
 export async function logout() {
     const response = await httpClient.post("/logout")
-    if (response.ok) {
-        authStore.clear()
-    }
+    // Clear local auth state regardless of server response so the UI never
+    // keeps showing an authenticated session with a dead/invalid token.
+    authStore.clear()
     return response
 }
 

@@ -38,18 +38,11 @@ function getAuthorLabel(author) {
 export function renderPostCard(post = {}, { onSelect, onEdit, onDelete, isDetailView = false } = {}) {
     const article = document.createElement("article")
     const author = post.author || {}
-    let currentUser = authStore.getUser ? authStore.getUser() : null
-
-    if (!currentUser && typeof window !== "undefined" && window.localStorage) {
-        try {
-            const savedState = JSON.parse(window.localStorage.getItem("tarmeez.auth") || "null")
-            currentUser = savedState?.user || null
-        } catch {
-            currentUser = null
-        }
-    }
+    const isAuthenticated = Boolean(authStore.isAuthenticated ? authStore.isAuthenticated() : authStore.getState?.().isAuthenticated)
+    const currentUser = isAuthenticated ? (authStore.getUser ? authStore.getUser() : null) : null
 
     const isOwnedPost = Boolean(
+        isAuthenticated &&
         currentUser &&
         author &&
         [currentUser.id, currentUser.userId, currentUser._id]

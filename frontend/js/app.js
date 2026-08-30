@@ -39,3 +39,7 @@ const header = renderHeader({
 })
 document.body.replaceChildren(header, main)
 router.start()
+
+// Re-render the active view whenever auth state changes (e.g. logout) so
+// stale owner-only controls (edit/delete) don't linger on screen.
+authStore.subscribe(() => router.render())
