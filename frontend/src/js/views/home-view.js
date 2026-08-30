@@ -25,7 +25,14 @@ export function renderHomeView(container, { navigate, service = postsService } =
     if (authStore.isAuthenticated()) {
         createPostModal = renderCreatePostModal({
             service,
-            onSuccess: () => load()
+            onSuccess: (post) => {
+                if (!list || !post) return
+
+                list.prepend(renderPostCard(post, {
+                    onSelect: (item) => navigate(`/posts/${item.id}`),
+                    onEdit: (item) => createPostModal?.open(item)
+                }))
+            }
         })
         createPostCard = renderCreatePostCard({ onOpen: () => createPostModal.open() })
     }

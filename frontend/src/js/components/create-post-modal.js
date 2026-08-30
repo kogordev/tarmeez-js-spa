@@ -108,6 +108,7 @@ export function renderCreatePostModal({ service = postsService, onSuccess, onClo
     form.addEventListener("submit", async (event) => {
         event.preventDefault()
         submit.disabled = true
+        submit.textContent = editingPost ? "Saving..." : "Creating..."
         error.hidden = true
         const selectedFile = imageFile.files?.[0]
         const input = {
@@ -136,11 +137,13 @@ export function renderCreatePostModal({ service = postsService, onSuccess, onClo
                 resetSubmitState(false)
                 error.textContent = messageFor(response)
                 error.hidden = false
+                showToast(messageFor(response))
             }
         } catch (requestError) {
             resetSubmitState(false)
             error.textContent = requestError?.message || "Unable to publish your post."
             error.hidden = false
+            showToast(error.textContent)
         }
     })
 
