@@ -30,26 +30,187 @@
 .site-header__action:hover, .auth-form button:hover, .comment-form button:hover, .error-state__retry:hover { background: var(--color-accent-dark); transform: translateY(-1px); }
 .site-header__register { text-decoration: none; }
 
+/* Desktop default: hide mobile menu controls */
+.site-header__menu-toggle,
+.mobile-nav-drawer {
+  display: none !important;
+}
+
 @media (max-width: 640px) {
   .site-header__nav { width: min(100% - 1rem, 980px); min-height: 3.75rem; flex-wrap: nowrap; }
   .site-header__account { gap: 0.5rem; }
+
+  /* Hide direct GitHub, Email, User menu, and Auth buttons in top navbar row on mobile */
+  .site-header__external-link,
+  .site-header__user,
+  .site-header__action,
+  .site-header__register,
   .site-header__theme-label,
-  .site-header__auth-label,
   .nav-link > span,
   .nav-btn > span,
   .navbar-item span { display: none !important; }
-  .site-header__theme,
-  .site-header__external-link,
-  .site-header__action,
-  .site-header__register { min-width: 40px; height: 40px; padding: 0; }
-  .site-header__theme { justify-content: center; }
+
+  .site-header__theme { min-width: 40px; height: 40px; padding: 0; justify-content: center; }
   .site-header__theme-icon { font-size: 1.15rem; }
-  .nav-link svg,
-  .nav-btn svg,
-  .navbar-item svg,
-  .site-header__theme svg,
-  .site-header__external-link svg,
-  .site-header__auth-icon { display: block; width: 1.15rem; height: 1.15rem; }
+
+  /* Mobile Hamburger Toggle Button */
+  .site-header__menu-toggle {
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    border: 1px solid var(--color-line);
+    border-radius: 999px;
+    color: var(--color-ink);
+    background: var(--color-surface);
+    cursor: pointer;
+    transition: border-color 160ms ease, background 160ms ease;
+  }
+  .site-header__menu-toggle:hover,
+  .site-header__menu-toggle:focus-visible {
+    border-color: var(--color-accent);
+    outline: none;
+  }
+  .site-header__menu-toggle svg {
+    display: block;
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+
+  /* Mobile Nav Drawer */
+  .mobile-nav-drawer {
+    display: flex !important;
+    flex-direction: column;
+    gap: 0.4rem;
+    padding: 0.85rem 1.25rem 1.25rem;
+    background: var(--color-header);
+    border-top: 1px solid var(--color-line);
+    box-shadow: 0 12px 24px var(--color-shadow-strong);
+    animation: slideDownDrawer 200ms ease-out forwards;
+  }
+
+  .mobile-nav-drawer[hidden] {
+    display: none !important;
+  }
+}
+
+@keyframes slideDownDrawer {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.mobile-nav-drawer__user {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid var(--color-line);
+  margin-bottom: 0.25rem;
+  color: var(--color-ink);
+  font-weight: 700;
+}
+.mobile-nav-drawer__user-avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  color: var(--color-ink);
+  background: var(--color-accent-soft);
+  flex-shrink: 0;
+}
+.mobile-nav-drawer__user-avatar svg {
+  width: 1.15rem;
+  height: 1.15rem;
+}
+.mobile-nav-drawer__user-name {
+  font-size: 0.95rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mobile-nav-drawer__link,
+.mobile-nav-drawer__button {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.65rem 0.85rem;
+  border: 0;
+  border-radius: 8px;
+  color: var(--color-ink);
+  background: transparent;
+  font: inherit;
+  font-size: 0.95rem;
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 160ms ease, color 160ms ease;
+  box-sizing: border-box;
+}
+
+.mobile-nav-drawer__link:hover,
+.mobile-nav-drawer__button:hover,
+.mobile-nav-drawer__link:focus-visible,
+.mobile-nav-drawer__button:focus-visible {
+  background: var(--color-accent-soft);
+  color: var(--color-accent-dark);
+  outline: none;
+}
+
+.mobile-nav-drawer__link svg,
+.mobile-nav-drawer__button svg {
+  width: 1.15rem;
+  height: 1.15rem;
+  flex-shrink: 0;
+}
+
+.mobile-nav-drawer__action {
+  color: white !important;
+  background: var(--color-accent) !important;
+  font-weight: 700;
+  justify-content: center;
+  margin-top: 0.25rem;
+}
+
+.mobile-nav-drawer__action:hover,
+.mobile-nav-drawer__action:focus-visible {
+  background: var(--color-accent-dark) !important;
+  color: white !important;
+}
+
+.mobile-nav-drawer__register {
+  color: var(--color-accent-dark) !important;
+  background: var(--color-accent-soft) !important;
+  font-weight: 700;
+  justify-content: center;
+}
+
+.mobile-nav-drawer__register:hover,
+.mobile-nav-drawer__register:focus-visible {
+  background: var(--color-accent) !important;
+  color: white !important;
+}
+
+.mobile-nav-drawer__logout {
+  color: var(--color-accent-dark);
+  background: var(--color-accent-soft);
+  font-weight: 700;
+}
+.mobile-nav-drawer__logout:hover,
+.mobile-nav-drawer__logout:focus-visible {
+  background: var(--color-accent);
+  color: white;
 }
 
 /* Ensure content containers span the full width of the card */

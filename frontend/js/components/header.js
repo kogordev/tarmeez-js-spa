@@ -28,6 +28,41 @@ function createAuthIcon(pathData) {
     return svg
 }
 
+function createFillIcon(pathData) {
+    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg")
+    const path = document.createElementNS("http://www.w3.org/2000/svg", "path")
+
+    svg.setAttribute("viewBox", "0 0 24 24")
+    svg.setAttribute("aria-hidden", "true")
+    path.setAttribute("d", pathData)
+    path.setAttribute("fill", "currentColor")
+    svg.appendChild(path)
+    return svg
+}
+
+function handleEmailCopy() {
+    const copyPromise = navigator.clipboard?.writeText("kogordev@gmail.com")
+    if (!copyPromise) return
+
+    copyPromise.then(() => {
+        const existingToast = document.body.querySelector(".tarmeez-toast")
+        if (existingToast) existingToast.remove()
+
+        const toast = document.createElement("div")
+        toast.className = "tarmeez-toast"
+        toast.textContent = "Email copied to clipboard!"
+        toast.style.position = "fixed"
+        toast.style.right = "24px"
+        toast.style.bottom = "24px"
+        toast.style.zIndex = "9999"
+        toast.style.padding = "12px 16px"
+        toast.style.borderRadius = "999px"
+        toast.style.fontSize = "0.9rem"
+        document.body.appendChild(toast)
+        window.setTimeout(() => toast.remove(), 2200)
+    }).catch(() => {})
+}
+
 export function renderHeader({ store = authStore, onLogin, onLogout, onNavigate } = {}) {
     const header = document.createElement("header")
     const nav = document.createElement("nav")
@@ -107,28 +142,7 @@ export function renderHeader({ store = authStore, onLogin, onLogout, onNavigate 
     emailIcon.appendChild(emailPath)
     emailLink.appendChild(emailIcon)
 
-    emailLink.addEventListener("click", () => {
-        const copyPromise = navigator.clipboard?.writeText("kogordev@gmail.com")
-        if (!copyPromise) return
-
-        copyPromise.then(() => {
-            const existingToast = document.body.querySelector(".tarmeez-toast")
-            if (existingToast) existingToast.remove()
-
-            const toast = document.createElement("div")
-            toast.className = "tarmeez-toast"
-            toast.textContent = "Email copied to clipboard!"
-            toast.style.position = "fixed"
-            toast.style.right = "24px"
-            toast.style.bottom = "24px"
-            toast.style.zIndex = "9999"
-            toast.style.padding = "12px 16px"
-            toast.style.borderRadius = "999px"
-            toast.style.fontSize = "0.9rem"
-            document.body.appendChild(toast)
-            window.setTimeout(() => toast.remove(), 2200)
-        }).catch(() => {})
-    })
+    emailLink.addEventListener("click", () => handleEmailCopy())
 
     action.type = "button"
     action.className = "site-header__action site-header__auth-button"
@@ -143,6 +157,121 @@ export function renderHeader({ store = authStore, onLogin, onLogout, onNavigate 
     registerLabel.className = "site-header__auth-label site-header__register-label"
     registerLabel.textContent = "Register"
     registerLink.append(registerIcon, registerLabel)
+
+    // Mobile Hamburger Menu Toggle Button
+    const menuToggle = document.createElement("button")
+    menuToggle.type = "button"
+    menuToggle.className = "site-header__menu-toggle"
+    menuToggle.setAttribute("aria-label", "Toggle navigation menu")
+    menuToggle.setAttribute("aria-expanded", "false")
+    const menuToggleIcon = createAuthIcon("M4 6h16M4 12h16M4 18h16")
+    menuToggle.appendChild(menuToggleIcon)
+
+    // Mobile Nav Drawer
+    const mobileDrawer = document.createElement("div")
+    mobileDrawer.className = "mobile-nav-drawer"
+    mobileDrawer.hidden = true
+
+    function closeMobileMenu() {
+        mobileDrawer.hidden = true
+        menuToggle.setAttribute("aria-expanded", "false")
+    }
+
+    function toggleMobileMenu() {
+        const isOpen = !mobileDrawer.hidden
+        mobileDrawer.hidden = isOpen
+        menuToggle.setAttribute("aria-expanded", String(!isOpen))
+    }
+
+    menuToggle.addEventListener("click", (e) => {
+        e.stopPropagation()
+        toggleMobileMenu()
+    })
+
+    // Elements inside mobile drawer
+    const mobileUserInfo = document.createElement("div")
+    mobileUserInfo.className = "mobile-nav-drawer__user"
+    const mobileUserAvatar = document.createElement("span")
+    mobileUserAvatar.className = "mobile-nav-drawer__user-avatar"
+    const mobileUserName = document.createElement("span")
+    mobileUserName.className = "mobile-nav-drawer__user-name"
+    mobileUserInfo.append(mobileUserAvatar, mobileUserName)
+
+    const mobileProfileLink = document.createElement("a")
+    mobileProfileLink.className = "mobile-nav-drawer__link"
+    mobileProfileLink.dataset.link = ""
+    const mobileProfileIcon = createAuthIcon("M20 21a8 8 0 1 0-16 0M12 12a4 4 0 1 0-4-4 4 4 0 0 0 4 4Z")
+    const mobileProfileLabel = document.createElement("span")
+    mobileProfileLabel.textContent = "Profile"
+    mobileProfileLink.append(mobileProfileIcon, mobileProfileLabel)
+    mobileProfileLink.addEventListener("click", () => closeMobileMenu())
+
+    const mobileGithubLink = document.createElement("a")
+    mobileGithubLink.className = "mobile-nav-drawer__link"
+    mobileGithubLink.href = "https://github.com/kogordev"
+    mobileGithubLink.target = "_blank"
+    mobileGithubLink.rel = "noopener noreferrer"
+    const mobileGithubIcon = createFillIcon("M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.38 7.86 10.9.58.1.79-.25.79-.56v-2.18c-3.2.7-3.88-1.37-3.88-1.37-.52-1.32-1.27-1.67-1.27-1.67-1.04-.7.08-.69.08-.69 1.15.08 1.75 1.17 1.75 1.17 1.02 1.74 2.68 1.24 3.33.95.1-.74.4-1.24.73-1.53-2.55-.29-5.23-1.28-5.23-5.69 0-1.26.45-2.29 1.18-3.09-.12-.29-.51-1.46.11-3.04 0 0 .96-.31 3.15 1.17a10.94 10.94 0 0 1 5.75 0c2.18-1.48 3.14-1.17 3.14-1.17.62 1.58.23 2.75.11 3.04.74.8 1.18 1.83 1.18 3.09 0 4.42-2.69 5.39-5.26 5.68.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.56A11.5 11.5 0 0 0 23.5 12C23.5 5.65 18.35.5 12 .5Z")
+    const mobileGithubLabel = document.createElement("span")
+    mobileGithubLabel.textContent = "GitHub Profile"
+    mobileGithubLink.append(mobileGithubIcon, mobileGithubLabel)
+    mobileGithubLink.addEventListener("click", () => closeMobileMenu())
+
+    const mobileEmailLink = document.createElement("a")
+    mobileEmailLink.className = "mobile-nav-drawer__link"
+    mobileEmailLink.href = "mailto:kogordev@gmail.com"
+    const mobileEmailIcon = createFillIcon("M3 6.75A2.75 2.75 0 0 1 5.75 4h12.5A2.75 2.75 0 0 1 21 6.75v10.5A2.75 2.75 0 0 1 18.25 20H5.75A2.75 2.75 0 0 1 3 17.25V6.75Zm2.2-.75 6.8 5.6 6.8-5.6H5.2Zm13.55 2.1-6.3 5.17a1 1 0 0 1-1.3 0L5.25 8.1v9.15c0 .41.34.75.75.75h12c.41 0 .75-.34.75-.75V8.1Z")
+    const mobileEmailLabel = document.createElement("span")
+    mobileEmailLabel.textContent = "Contact Developer"
+    mobileEmailLink.append(mobileEmailIcon, mobileEmailLabel)
+    mobileEmailLink.addEventListener("click", () => {
+        closeMobileMenu()
+        handleEmailCopy()
+    })
+
+    const mobileLoginButton = document.createElement("button")
+    mobileLoginButton.type = "button"
+    mobileLoginButton.className = "mobile-nav-drawer__button mobile-nav-drawer__action"
+    const mobileLoginIcon = createAuthIcon("M10 17V21H3V3H10V7M15 7L21 12L15 17M21 12H7")
+    const mobileLoginLabel = document.createElement("span")
+    mobileLoginLabel.textContent = "Log in"
+    mobileLoginButton.append(mobileLoginIcon, mobileLoginLabel)
+    mobileLoginButton.addEventListener("click", () => {
+        closeMobileMenu()
+        onLogin?.()
+    })
+
+    const mobileRegisterLink = document.createElement("a")
+    mobileRegisterLink.className = "mobile-nav-drawer__button mobile-nav-drawer__register"
+    mobileRegisterLink.href = "/register"
+    mobileRegisterLink.dataset.link = ""
+    const mobileRegisterIcon = createAuthIcon("M16 19v-1a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v1M9.5 10.5A3.5 3.5 0 1 0 9.5 3.5a3.5 3.5 0 0 0 0 7ZM19 8V15M16 11.5H22")
+    const mobileRegisterLabel = document.createElement("span")
+    mobileRegisterLabel.textContent = "Register"
+    mobileRegisterLink.append(mobileRegisterIcon, mobileRegisterLabel)
+    mobileRegisterLink.addEventListener("click", () => closeMobileMenu())
+
+    const mobileLogoutButton = document.createElement("button")
+    mobileLogoutButton.type = "button"
+    mobileLogoutButton.className = "mobile-nav-drawer__button mobile-nav-drawer__logout"
+    const mobileLogoutIcon = createAuthIcon("M10 17V21H3V3H10V7M15 7L21 12L15 17M21 12H7")
+    const mobileLogoutLabel = document.createElement("span")
+    mobileLogoutLabel.textContent = "Log out"
+    mobileLogoutButton.append(mobileLogoutIcon, mobileLogoutLabel)
+    mobileLogoutButton.addEventListener("click", async () => {
+        closeMobileMenu()
+        await authService.logout()
+    })
+
+    mobileDrawer.append(
+        mobileUserInfo,
+        mobileProfileLink,
+        mobileGithubLink,
+        mobileEmailLink,
+        mobileLoginButton,
+        mobileRegisterLink,
+        mobileLogoutButton
+    )
 
     homeLink.addEventListener("click", (event) => {
         if (onNavigate) {
@@ -174,6 +303,9 @@ export function renderHeader({ store = authStore, onLogin, onLogout, onNavigate 
     const onDocumentClick = (event) => {
         if (!account.contains(event.target)) {
             closeUserDropdown()
+        }
+        if (!header.contains(event.target)) {
+            closeMobileMenu()
         }
     }
     document.addEventListener("click", onDocumentClick)
@@ -209,6 +341,30 @@ export function renderHeader({ store = authStore, onLogin, onLogout, onNavigate 
             accountText.textContent = getUserLabel(state.user)
             accountLabel.replaceChildren(accountAvatar, accountText)
             profileLink.href = `/profile/${encodeURIComponent(state.user?.id || "")}`
+
+            // Mobile drawer - Logged In
+            mobileUserInfo.hidden = false
+            mobileUserInfo.style.display = ""
+            mobileUserAvatar.innerHTML = ""
+            mobileUserAvatar.appendChild(userAvatarIcon.cloneNode(true))
+            mobileUserName.textContent = getUserLabel(state.user)
+
+            mobileProfileLink.hidden = false
+            mobileProfileLink.style.display = ""
+            mobileProfileLink.href = `/profile/${encodeURIComponent(state.user?.id || "")}`
+
+            mobileGithubLink.hidden = false
+            mobileGithubLink.style.display = ""
+            mobileEmailLink.hidden = false
+            mobileEmailLink.style.display = ""
+
+            mobileLoginButton.hidden = true
+            mobileLoginButton.style.display = "none"
+            mobileRegisterLink.hidden = true
+            mobileRegisterLink.style.display = "none"
+
+            mobileLogoutButton.hidden = false
+            mobileLogoutButton.style.display = ""
         } else {
             action.style.display = ""
             registerLink.style.display = ""
@@ -217,14 +373,33 @@ export function renderHeader({ store = authStore, onLogin, onLogout, onNavigate 
 
             accountLabel.replaceChildren(accountAvatar)
             accountText.textContent = ""
+
+            // Mobile drawer - Guest
+            mobileUserInfo.hidden = true
+            mobileUserInfo.style.display = "none"
+            mobileProfileLink.hidden = true
+            mobileProfileLink.style.display = "none"
+
+            mobileGithubLink.hidden = false
+            mobileGithubLink.style.display = ""
+            mobileEmailLink.hidden = false
+            mobileEmailLink.style.display = ""
+
+            mobileLoginButton.hidden = false
+            mobileLoginButton.style.display = ""
+            mobileRegisterLink.hidden = false
+            mobileRegisterLink.style.display = ""
+
+            mobileLogoutButton.hidden = true
+            mobileLogoutButton.style.display = "none"
         }
     }
 
     nav.append(homeLink, account)
     userMenu.append(accountLabel, userDropdown)
-    account.append(themeToggle, githubLink, emailLink, userMenu, action, registerLink)
+    account.append(themeToggle, githubLink, emailLink, userMenu, action, registerLink, menuToggle)
     accountLabel.append(accountAvatar, accountText)
-    header.append(nav)
+    header.append(nav, mobileDrawer)
     update()
     updateTheme()
 
