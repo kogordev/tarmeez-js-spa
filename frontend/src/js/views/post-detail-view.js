@@ -19,7 +19,8 @@ function renderCommentItem(comment = {}) {
     const item = document.createElement("article")
     const author = comment.author?.name || comment.author?.username || "Anonymous"
     item.className = "comment"
-    item.innerHTML = `<strong>${escapeHtml(author)}</strong><p>${escapeHtml(comment.body || "")}</p>`
+    item.setAttribute("dir", "auto")
+    item.innerHTML = `<strong dir="auto">${escapeHtml(author)}</strong><p dir="auto">${escapeHtml(comment.body || "")}</p>`
     return item
 }
 
@@ -81,6 +82,7 @@ export function renderPostDetailView(container, { postId, service = postsService
             input.name = "body"
             input.required = true
             input.placeholder = "Write a comment"
+            input.setAttribute("dir", "auto")
             submit.type = "submit"
             submit.textContent = "Comment"
             error.className = "form-error"

@@ -66,6 +66,7 @@ export function renderPostCard(post = {}, { onSelect, onEdit, onDelete, isDetail
     const detailLink = document.createElement("a")
 
     article.className = "post-card"
+    article.setAttribute("dir", "auto")
     if (post.id !== undefined && post.id !== null) {
         article.dataset.postId = String(post.id)
     }
@@ -91,12 +92,15 @@ export function renderPostCard(post = {}, { onSelect, onEdit, onDelete, isDetail
     timestamp.dateTime = post.createdAt || ""
     setSafeText(timestamp, formatTimestamp(post.createdAt))
     title.className = "post-card__title"
+    title.setAttribute("dir", "auto")
     const titleLink = document.createElement("a")
     titleLink.href = `/post/${encodeURIComponent(post.id)}`
     titleLink.dataset.link = ""
+    titleLink.setAttribute("dir", "auto")
     setSafeText(titleLink, post.title || "Untitled post")
     title.append(titleLink)
     body.className = "post-card__body"
+    body.setAttribute("dir", "auto")
     setSafeText(body, post.body || "")
     postImage.className = "post-card__image"
     postImage.alt = post.title ? `${post.title} image` : "Post image"

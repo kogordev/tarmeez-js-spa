@@ -34,9 +34,11 @@ export function renderCreatePostModal({ service = postsService, onSuccess, onClo
     title.name = "title"
     title.placeholder = "Title"
     title.required = true
+    title.setAttribute("dir", "auto")
     body.name = "body"
     body.placeholder = "Share something with the community..."
     body.required = true
+    body.setAttribute("dir", "auto")
     imageUrl.name = "imageUrl"
     imageUrl.type = "url"
     imageUrl.placeholder = "Image URL (optional)"
