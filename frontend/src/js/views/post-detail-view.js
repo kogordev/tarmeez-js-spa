@@ -98,11 +98,8 @@ export function renderPostDetailView(container, { postId, service = postsService
                 toast.style.right = "24px"
                 toast.style.bottom = "24px"
                 toast.style.zIndex = "9999"
-                toast.style.background = "#111827"
-                toast.style.color = "#fff"
                 toast.style.padding = "12px 16px"
                 toast.style.borderRadius = "999px"
-                toast.style.boxShadow = "0 12px 30px rgba(15, 23, 42, 0.2)"
                 toast.style.fontSize = "0.9rem"
                 document.body.appendChild(toast)
                 window.setTimeout(() => toast.remove(), 2200)

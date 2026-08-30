@@ -180,41 +180,13 @@ export function renderPostCard(post = {}, { onSelect, onEdit, onDelete, isDetail
         menuButton.textContent = "..."
         menuButton.setAttribute("aria-label", "Post actions")
         menuButton.setAttribute("aria-expanded", "false")
-        menuButton.style.background = "transparent"
-        menuButton.style.border = "none"
-        menuButton.style.color = "#4b5563"
-        menuButton.style.cursor = "pointer"
-        menuButton.style.fontSize = "1.5rem"
-        menuButton.style.lineHeight = "1"
-        menuButton.style.padding = "4px 8px"
-        menuButton.style.borderRadius = "6px"
-        menuButton.style.alignSelf = "flex-start"
 
         menu.className = "post-card__menu"
         menu.hidden = true
-        menu.style.position = "absolute"
-        menu.style.top = "calc(100% + 8px)"
-        menu.style.right = "0"
-        menu.style.minWidth = "160px"
-        menu.style.background = "#fff"
-        menu.style.border = "1px solid #e5e7eb"
-        menu.style.borderRadius = "8px"
-        menu.style.boxShadow = "0 12px 24px rgba(15, 23, 42, 0.12)"
-        menu.style.zIndex = "10"
-        menu.style.display = "flex"
-        menu.style.flexDirection = "column"
-        menu.style.padding = "8px 0"
 
         ;[editAction, deleteAction].forEach((actionButton) => {
             actionButton.type = "button"
-            actionButton.style.background = "transparent"
-            actionButton.style.border = "none"
-            actionButton.style.textAlign = "left"
-            actionButton.style.padding = "10px 16px"
-            actionButton.style.cursor = "pointer"
-            actionButton.style.fontSize = "0.95rem"
-            actionButton.style.color = "#111827"
-            actionButton.style.width = "100%"
+            actionButton.className = "post-card__menu-action"
         })
 
         editAction.textContent = "Edit Post"
