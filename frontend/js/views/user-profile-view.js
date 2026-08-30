@@ -37,7 +37,7 @@ export function renderUserProfileView(container, { userId, navigate, userService
                 heading,
                 details,
                 renderPostList(sortByNewest(postsResponse.data.items), {
-                    onSelect: (post) => navigate(`/posts/${post.id}`),
+                    onSelect: (post) => navigate(`#/posts/${post.id}`),
                     onEdit: (post) => editModal.open(post)
                 }),
                 editModal

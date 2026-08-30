@@ -25,36 +25,58 @@ function matchRoute(pathname, routeList) {
     return null
 }
 
+function getHashPath() {
+    let hash = window.location.hash.slice(1) || "/"
+    if (!hash.startsWith("/")) {
+        hash = "/" + hash
+    }
+    return hash.split("?")[0] || "/"
+}
+
 export function createRouter({ routeList = routes, render = () => {}, root = document } = {}) {
     function renderLocation() {
-        const route = matchRoute(window.location.pathname, routeList) || matchRoute("/404", routeList)
+        const path = getHashPath()
+        const route = matchRoute(path, routeList) || matchRoute("/404", routeList)
         render(route, root)
         return route
     }
 
     function navigate(path) {
-        window.history.pushState({}, "", path)
+        const targetHash = path.startsWith("#") ? path : `#${path}`
+        if (window.location.hash === targetHash) {
+            return renderLocation()
+        }
+        window.location.hash = targetHash
         return renderLocation()
     }
 
     function handleLinkClick(event) {
         const link = event.target.closest?.("a[data-link]")
-        if (!link || link.origin !== window.location.origin) {
+        if (!link) {
             return
         }
-        event.preventDefault()
-        navigate(`${link.pathname}${link.search}${link.hash}`)
+        const href = link.getAttribute("href")
+        if (!href) {
+            return
+        }
+
+        if (href.startsWith("#") || href.startsWith("/")) {
+            event.preventDefault()
+            navigate(href)
+        }
     }
 
     function start() {
         root.addEventListener("click", handleLinkClick)
-        window.addEventListener("popstate", renderLocation)
+        window.addEventListener("hashchange", renderLocation)
+        window.addEventListener("load", renderLocation)
         return renderLocation()
     }
 
     function stop() {
         root.removeEventListener("click", handleLinkClick)
-        window.removeEventListener("popstate", renderLocation)
+        window.removeEventListener("hashchange", renderLocation)
+        window.removeEventListener("load", renderLocation)
     }
 
     return { start, stop, navigate, render: renderLocation, match: (pathname) => matchRoute(pathname, routeList) }

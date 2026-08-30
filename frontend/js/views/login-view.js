@@ -17,13 +17,13 @@ export function renderLoginView(container, { navigate, service = authService } =
     submit.type = "submit"; submit.textContent = "Log in"
     error.className = "form-error"
     registerPrompt.className = "auth-form__prompt"
-    registerLink.href = "/register"; registerLink.dataset.link = ""; registerLink.textContent = "Don't have an account? Register here"
+    registerLink.href = "#/register"; registerLink.dataset.link = ""; registerLink.textContent = "Don't have an account? Register here"
     registerPrompt.append(registerLink)
     form.append(username, password, submit, error, registerPrompt)
     form.addEventListener("submit", async (event) => {
         event.preventDefault(); submit.disabled = true; error.textContent = ""
         const response = await service.login({ username: username.value, password: password.value })
-        if (response.ok) navigate("/")
+        if (response.ok) navigate("#/")
         else { error.replaceWith(renderErrorState(messageFor(response))); submit.disabled = false }
     })
     container.replaceChildren(form)

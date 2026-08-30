@@ -19,7 +19,7 @@ function renderRoute(route) {
 	cleanup()
 	cleanup = () => {}
 	if (route.protected && !authStore.isAuthenticated()) {
-		router.navigate("/login")
+		router.navigate("#/login")
 		return
 	}
 	const options = { navigate: router.navigate }
@@ -33,7 +33,7 @@ function renderRoute(route) {
 
 const router = createRouter({ render: renderRoute })
 const header = renderHeader({
-	onLogin: () => router.navigate("/login"),
+	onLogin: () => router.navigate("#/login"),
 	onLogout: async () => { await authService.logout() },
 	onNavigate: (path) => router.navigate(path)
 })

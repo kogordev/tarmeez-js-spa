@@ -95,7 +95,7 @@ export function renderHeader({ store = authStore, onLogin, onLogout, onNavigate 
     header.className = "site-header"
     nav.className = "site-header__nav"
     homeLink.className = "site-header__home"
-    homeLink.href = "/"
+    homeLink.href = "#/"
     homeLink.dataset.link = ""
     setSafeText(homeLink, "Tarmeez")
     account.className = "site-header__account"
@@ -152,7 +152,7 @@ export function renderHeader({ store = authStore, onLogin, onLogout, onNavigate 
     action.append(actionIcon, actionLabel)
 
     registerLink.className = "site-header__action site-header__register site-header__auth-button"
-    registerLink.href = "/register"
+    registerLink.href = "#/register"
     registerLink.dataset.link = ""
     registerLabel.className = "site-header__auth-label site-header__register-label"
     registerLabel.textContent = "Register"
@@ -243,7 +243,7 @@ export function renderHeader({ store = authStore, onLogin, onLogout, onNavigate 
 
     const mobileRegisterLink = document.createElement("a")
     mobileRegisterLink.className = "mobile-nav-drawer__button mobile-nav-drawer__register"
-    mobileRegisterLink.href = "/register"
+    mobileRegisterLink.href = "#/register"
     mobileRegisterLink.dataset.link = ""
     const mobileRegisterIcon = createAuthIcon("M16 19v-1a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v1M9.5 10.5A3.5 3.5 0 1 0 9.5 3.5a3.5 3.5 0 0 0 0 7ZM19 8V15M16 11.5H22")
     const mobileRegisterLabel = document.createElement("span")
@@ -276,7 +276,7 @@ export function renderHeader({ store = authStore, onLogin, onLogout, onNavigate 
     homeLink.addEventListener("click", (event) => {
         if (onNavigate) {
             event.preventDefault()
-            onNavigate("/")
+            onNavigate("#/")
         }
     })
 
@@ -340,7 +340,7 @@ export function renderHeader({ store = authStore, onLogin, onLogout, onNavigate 
             accountAvatar.appendChild(userAvatarIcon.cloneNode(true))
             accountText.textContent = getUserLabel(state.user)
             accountLabel.replaceChildren(accountAvatar, accountText)
-            profileLink.href = `/users/${encodeURIComponent(state.user?.id || "")}`
+            profileLink.href = `#/users/${encodeURIComponent(state.user?.id || "")}`
 
             // Mobile drawer - Logged In
             mobileUserInfo.hidden = false
@@ -351,7 +351,7 @@ export function renderHeader({ store = authStore, onLogin, onLogout, onNavigate 
 
             mobileProfileLink.hidden = false
             mobileProfileLink.style.display = ""
-            mobileProfileLink.href = `/users/${encodeURIComponent(state.user?.id || "")}`
+            mobileProfileLink.href = `#/users/${encodeURIComponent(state.user?.id || "")}`
 
             mobileGithubLink.hidden = false
             mobileGithubLink.style.display = ""

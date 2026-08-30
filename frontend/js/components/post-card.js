@@ -82,7 +82,7 @@ export function renderPostCard(post = {}, { onSelect, onEdit, onDelete, isDetail
     setSafeText(authorName, getAuthorLabel(author))
     authorLink.className = "post-card__author-link"
     if (author.id !== undefined && author.id !== null) {
-        authorLink.href = `/users/${encodeURIComponent(author.id)}`
+        authorLink.href = `#/users/${encodeURIComponent(author.id)}`
         authorLink.dataset.link = ""
         authorLink.append(authorImage, authorName)
     }
@@ -92,7 +92,7 @@ export function renderPostCard(post = {}, { onSelect, onEdit, onDelete, isDetail
     title.className = "post-card__title"
     title.setAttribute("dir", "auto")
     const titleLink = document.createElement("a")
-    titleLink.href = `/post/${encodeURIComponent(post.id)}`
+    titleLink.href = `#/posts/${encodeURIComponent(post.id)}`
     titleLink.dataset.link = ""
     titleLink.setAttribute("dir", "auto")
     setSafeText(titleLink, post.title || "Untitled post")
@@ -117,7 +117,7 @@ export function renderPostCard(post = {}, { onSelect, onEdit, onDelete, isDetail
     comments.className = "post-card__comments"
     setSafeText(comments, `Comments: ${post.commentsCount ?? post.comments_count ?? 0}`)
     detailLink.className = "post-card__detail-link"
-    detailLink.href = `/post/${encodeURIComponent(post.id)}`
+    detailLink.href = `#/posts/${encodeURIComponent(post.id)}`
     detailLink.dataset.link = ""
     setSafeText(detailLink, "Read more / comments")
 

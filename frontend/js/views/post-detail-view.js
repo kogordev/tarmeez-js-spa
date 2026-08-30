@@ -66,7 +66,7 @@ export function renderPostDetailView(container, { postId, service = postsService
         detailCard.append(renderPostCard(post, {
             isDetailView: true,
             onEdit: (item) => editModal.open(item),
-            onDelete: () => navigate?.("/")
+            onDelete: () => navigate?.("#/")
         }))
 
         commentsSection.append(renderComments(post.comments || [], {

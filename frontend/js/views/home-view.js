@@ -33,7 +33,7 @@ export function renderHomeView(container, { navigate, service = postsService } =
                 if (!list || !post) return
 
                 list.prepend(renderPostCard(post, {
-                    onSelect: (item) => navigate(`/posts/${item.id}`),
+                    onSelect: (item) => navigate(`#/posts/${item.id}`),
                     onEdit: (item) => createPostModal?.open(item)
                 }))
             }
@@ -77,7 +77,7 @@ export function renderHomeView(container, { navigate, service = postsService } =
         const { items, meta, links } = response.data
         hasNextPage = responseHasNextPage(meta, links)
         list = renderPostList(sortByNewest(items), {
-            onSelect: (post) => navigate(`/posts/${post.id}`),
+            onSelect: (post) => navigate(`#/posts/${post.id}`),
             onEdit: (post) => createPostModal?.open(post)
         })
         infiniteScroll = renderInfiniteScroll({ onLoadMore: loadNextPage })
@@ -100,7 +100,7 @@ export function renderHomeView(container, { navigate, service = postsService } =
 
         const { items, meta, links } = response.data
         const nextList = renderPostList(sortByNewest(items), {
-            onSelect: (post) => navigate(`/posts/${post.id}`),
+            onSelect: (post) => navigate(`#/posts/${post.id}`),
             onEdit: (post) => createPostModal?.open(post)
         })
         list.append(...nextList.children)

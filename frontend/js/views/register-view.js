@@ -21,13 +21,13 @@ export function renderRegisterView(container, { navigate, service = authService 
     const loginLink = document.createElement("a")
     error.className = "form-error"
     loginPrompt.className = "auth-form__prompt"
-    loginLink.href = "/login"; loginLink.dataset.link = ""; loginLink.textContent = "Already have an account? Log in"
+    loginLink.href = "#/login"; loginLink.dataset.link = ""; loginLink.textContent = "Already have an account? Log in"
     loginPrompt.append(loginLink)
     form.append(submit, error, loginPrompt)
     form.addEventListener("submit", async (event) => {
         event.preventDefault(); submit.disabled = true; error.textContent = ""
         const response = await service.register(Object.fromEntries(new FormData(form)))
-        if (response.ok) navigate("/login")
+        if (response.ok) navigate("#/login")
         else { error.replaceWith(renderErrorState(messageFor(response))); submit.disabled = false }
     })
     container.replaceChildren(form)
