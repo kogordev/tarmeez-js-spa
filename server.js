@@ -1,10 +1,13 @@
-const express = require("express")
-const path = require("path")
-const app = express()
+const express = require("express");
+const path = require("path");
+const app = express();
 
-app.use(express.static(path.resolve(__dirname, "tarmeez")))
-app.get("/*splat", (req, res)=>{
-    res.sendFile(path.resolve(__dirname, "frontend", "index.html"))
-})
+app.use(express.static(path.resolve(__dirname, "frontend")));
 
-app.listen(process.env.PORT || 5600, ()=>console.log("server running..."))
+app.get("*splat", (req, res) => {
+    res.sendFile(path.resolve(__dirname, "frontend", "index.html"));
+});
+
+app.listen(process.env.PORT || 5600, () => {
+    console.log("Server running on port 5600...");
+});

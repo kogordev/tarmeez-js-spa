@@ -26,13 +26,21 @@
   .site-header__user,
   .site-header__theme-label,
   .site-header__action-label,
-  .site-header__register-label { display: none; }
+  .site-header__register-label,
+  .nav-link > span,
+  .nav-btn > span,
+  .navbar-item span { display: none !important; }
   .site-header__theme,
   .site-header__external-link,
   .site-header__action,
   .site-header__register { min-width: 40px; height: 40px; padding: 0; }
   .site-header__theme { justify-content: center; }
   .site-header__theme-icon { font-size: 1.15rem; }
+  .nav-link svg,
+  .nav-btn svg,
+  .navbar-item svg,
+  .site-header__theme svg,
+  .site-header__external-link svg { display: block; width: 1.15rem; height: 1.15rem; }
   .site-header__action,
   .site-header__register { display: none; }
 }
