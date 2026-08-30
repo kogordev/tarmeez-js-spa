@@ -18,6 +18,12 @@ export function renderHeader({ store = authStore, onLogin, onLogout, onNavigate 
     const accountLabel = document.createElement("span")
     const themeToggle = document.createElement("button")
     const themeIcon = document.createElement("span")
+    const githubLink = document.createElement("a")
+    const githubIcon = document.createElementNS("http://www.w3.org/2000/svg", "svg")
+    const githubPath = document.createElementNS("http://www.w3.org/2000/svg", "path")
+    const emailLink = document.createElement("a")
+    const emailIcon = document.createElementNS("http://www.w3.org/2000/svg", "svg")
+    const emailPath = document.createElementNS("http://www.w3.org/2000/svg", "path")
     const action = document.createElement("button")
     const registerLink = document.createElement("a")
 
@@ -33,6 +39,29 @@ export function renderHeader({ store = authStore, onLogin, onLogout, onNavigate 
     themeToggle.className = "site-header__theme"
     themeIcon.className = "site-header__theme-icon"
     themeIcon.setAttribute("aria-hidden", "true")
+
+    githubLink.className = "site-header__external-link"
+    githubLink.href = "https://github.com/kogordev"
+    githubLink.target = "_blank"
+    githubLink.rel = "noopener noreferrer"
+    githubLink.setAttribute("aria-label", "GitHub Profile")
+    githubLink.setAttribute("title", "GitHub Profile")
+    githubIcon.setAttribute("viewBox", "0 0 24 24")
+    githubIcon.setAttribute("aria-hidden", "true")
+    githubPath.setAttribute("d", "M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.38 7.86 10.9.58.1.79-.25.79-.56v-2.18c-3.2.7-3.88-1.37-3.88-1.37-.52-1.32-1.27-1.67-1.27-1.67-1.04-.7.08-.69.08-.69 1.15.08 1.75 1.17 1.75 1.17 1.02 1.74 2.68 1.24 3.33.95.1-.74.4-1.24.73-1.53-2.55-.29-5.23-1.28-5.23-5.69 0-1.26.45-2.29 1.18-3.09-.12-.29-.51-1.46.11-3.04 0 0 .96-.31 3.15 1.17a10.94 10.94 0 0 1 5.75 0c2.18-1.48 3.14-1.17 3.14-1.17.62 1.58.23 2.75.11 3.04.74.8 1.18 1.83 1.18 3.09 0 4.42-2.69 5.39-5.26 5.68.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.56A11.5 11.5 0 0 0 23.5 12C23.5 5.65 18.35.5 12 .5Z")
+    githubIcon.appendChild(githubPath)
+    githubLink.appendChild(githubIcon)
+
+    emailLink.className = "site-header__external-link"
+    emailLink.href = "mailto:kogordev@gmail.com"
+    emailLink.setAttribute("aria-label", "Contact Developer")
+    emailLink.setAttribute("title", "Contact Developer")
+    emailIcon.setAttribute("viewBox", "0 0 24 24")
+    emailIcon.setAttribute("aria-hidden", "true")
+    emailPath.setAttribute("d", "M3 6.75A2.75 2.75 0 0 1 5.75 4h12.5A2.75 2.75 0 0 1 21 6.75v10.5A2.75 2.75 0 0 1 18.25 20H5.75A2.75 2.75 0 0 1 3 17.25V6.75Zm2.2-.75 6.8 5.6 6.8-5.6H5.2Zm13.55 2.1-6.3 5.17a1 1 0 0 1-1.3 0L5.25 8.1v9.15c0 .41.34.75.75.75h12c.41 0 .75-.34.75-.75V8.1Z")
+    emailIcon.appendChild(emailPath)
+    emailLink.appendChild(emailIcon)
+
     action.type = "button"
     action.className = "site-header__action"
     registerLink.className = "site-header__action site-header__register"
@@ -84,7 +113,7 @@ export function renderHeader({ store = authStore, onLogin, onLogout, onNavigate 
     }
 
     nav.append(homeLink, account)
-    account.append(themeToggle, accountLabel, action, registerLink)
+    account.append(themeToggle, githubLink, emailLink, accountLabel, action, registerLink)
     header.append(nav)
     update()
     updateTheme()
