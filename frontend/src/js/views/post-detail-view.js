@@ -15,15 +15,19 @@ function sameUser(firstUser, secondUser) {
     return firstId != null && secondId != null && String(firstId) === String(secondId)
 }
 
+function renderCommentItem(comment = {}) {
+    const item = document.createElement("article")
+    const author = comment.author?.name || comment.author?.username || "Anonymous"
+    item.className = "comment"
+    item.innerHTML = `<strong>${escapeHtml(author)}</strong><p>${escapeHtml(comment.body || "")}</p>`
+    return item
+}
+
 function renderComments(comments = [], { currentUser } = {}) {
     const section = document.createElement("section")
     section.className = "comments"
     comments.forEach((comment) => {
-        const item = document.createElement("article")
-        item.className = "comment"
-        const author = comment.author?.name || comment.author?.username || "Anonymous"
-        item.innerHTML = `<strong>${escapeHtml(author)}</strong><p>${escapeHtml(comment.body)}</p>`
-        section.append(item)
+        section.append(renderCommentItem(comment))
     })
     return section
 }
@@ -81,19 +85,73 @@ export function renderPostDetailView(container, { postId, service = postsService
             submit.textContent = "Comment"
             error.className = "form-error"
             form.append(input, submit, error)
+            const showToast = (message) => {
+                const existingToast = document.body.querySelector(".tarmeez-toast")
+                if (existingToast) existingToast.remove()
+
+                const toast = document.createElement("div")
+                toast.className = "tarmeez-toast"
+                toast.textContent = message
+                toast.style.position = "fixed"
+                toast.style.right = "24px"
+                toast.style.bottom = "24px"
+                toast.style.zIndex = "9999"
+                toast.style.background = "#111827"
+                toast.style.color = "#fff"
+                toast.style.padding = "12px 16px"
+                toast.style.borderRadius = "999px"
+                toast.style.boxShadow = "0 12px 30px rgba(15, 23, 42, 0.2)"
+                toast.style.fontSize = "0.9rem"
+                document.body.appendChild(toast)
+                window.setTimeout(() => toast.remove(), 2200)
+            }
+
             form.addEventListener("submit", async (event) => {
                 event.preventDefault()
-                submit.disabled = true
-                error.textContent = ""
-                const response = await commentService.createComment(postId, input.value)
-                if (!active) return
-                if (!response.ok) {
-                    error.textContent = messageFor(response)
-                    submit.disabled = false
+                const body = input.value.trim()
+
+                if (!body) {
+                    error.textContent = "Please enter a comment."
                     return
                 }
+
+                submit.disabled = true
+                submit.textContent = "Posting..."
+                error.textContent = ""
+
+                const response = await commentService.createComment(postId, body)
+                if (!active) return
+
+                if (!response.ok) {
+                    showToast(messageFor(response))
+                    error.textContent = messageFor(response)
+                    submit.disabled = false
+                    submit.textContent = "Comment"
+                    return
+                }
+
+                const createdComment = response.data || {
+                    body,
+                    author: store.getUser ? store.getUser() : null
+                }
+                const commentsList = commentsSection.querySelector(".comments")
+                if (commentsList) {
+                    commentsList.prepend(renderCommentItem(createdComment))
+                }
+
+                post.comments = [createdComment, ...(post.comments || [])]
+                const currentCount = Number(post.commentsCount ?? post.comments_count ?? 0)
+                const nextCount = currentCount + 1
+                post.commentsCount = nextCount
+
+                const counter = detailCard.querySelector(".post-card__comments")
+                if (counter) {
+                    counter.textContent = `Comments: ${nextCount}`
+                }
+
                 input.value = ""
-                await load()
+                submit.disabled = false
+                submit.textContent = "Comment"
             })
             commentsSection.append(form)
         }
