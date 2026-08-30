@@ -66,12 +66,17 @@
 .comment-form textarea { min-height: 7rem; resize: vertical; }
 .comment-form button { justify-self: end; }
 .form-error { margin: 0; color: var(--color-accent-dark); }
-.comments { display: grid; width: 100%; gap: var(--space-2); margin-top: var(--space-4); }
-.comments h2 { margin: 0 0 var(--space-2); font: 700 1.3rem var(--font-display); }
+.post-detail-card { border: 1px solid var(--color-line); border-radius: 12px; background: var(--color-surface); box-shadow: 0 8px 24px rgba(24, 35, 43, 0.06); overflow: hidden; }
+.post-detail-card > .post-card { margin: 0; border: 0; border-radius: 0; box-shadow: none; background: transparent; }
+.post-detail-card > .post-card:hover, .post-detail-card > .post-card:focus-visible { transform: none; box-shadow: none; }
+.post-detail-card__comments { border-top: 1px solid #eee; margin-top: 1rem; padding: 1rem 1.25rem 1.25rem; }
+.comments { display: grid; width: 100%; gap: var(--space-2); margin: 0; }
 .comment { padding: var(--space-3); border-left: 3px solid var(--color-accent); background: rgba(255, 255, 255, 0.7); }
 .comment p { margin: var(--space-1) 0 0; color: var(--color-muted); }
 .comment__delete { margin-top: var(--space-2); border: 0; padding: 0; color: var(--color-accent-dark); background: transparent; font-weight: 700; cursor: pointer; }
 .comment__delete:hover { text-decoration: underline; }
+.post-detail-card .comment-form { width: 100%; max-width: none; margin: 1rem 0 0; padding: 0; border: 0; background: transparent; box-shadow: none; }
+.post-detail-card .comment-form textarea { min-height: 7rem; }
 .ui-confirm { position: fixed; inset: 0; z-index: 9999; display: flex; align-items: center; justify-content: center; padding: var(--space-3); background: rgba(24, 35, 43, 0.48); }
 .ui-confirm[hidden] { display: none; }
 .ui-confirm__panel { width: min(100%, 420px); padding: var(--space-5); border: 1px solid var(--color-line); border-radius: 12px; background: var(--color-surface); box-shadow: 0 20px 60px rgba(24, 35, 43, 0.24); }

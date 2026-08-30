@@ -18,9 +18,6 @@ function sameUser(firstUser, secondUser) {
 function renderComments(comments = [], { currentUser } = {}) {
     const section = document.createElement("section")
     section.className = "comments"
-    const heading = document.createElement("h2")
-    heading.textContent = `Comments (${comments.length})`
-    section.append(heading)
     comments.forEach((comment) => {
         const item = document.createElement("article")
         item.className = "comment"
@@ -55,14 +52,22 @@ export function renderPostDetailView(container, { postId, service = postsService
 
     function render() {
         const content = document.createDocumentFragment()
-        content.append(renderPostCard(post, {
+        const detailCard = document.createElement("div")
+        const commentsSection = document.createElement("div")
+
+        detailCard.className = "post-detail-card"
+        commentsSection.className = "post-detail-card__comments"
+
+        detailCard.append(renderPostCard(post, {
             isDetailView: true,
             onEdit: (item) => editModal.open(item),
             onDelete: () => navigate?.("/")
-        }), editModal)
-        content.append(renderComments(post.comments || [], {
+        }))
+
+        commentsSection.append(renderComments(post.comments || [], {
             currentUser: store.getUser()
         }))
+
         if (store.isAuthenticated()) {
             const form = document.createElement("form")
             const input = document.createElement("textarea")
@@ -90,8 +95,11 @@ export function renderPostDetailView(container, { postId, service = postsService
                 input.value = ""
                 await load()
             })
-            content.append(form)
+            commentsSection.append(form)
         }
+
+        detailCard.append(commentsSection)
+        content.append(detailCard, editModal)
         container.replaceChildren(content)
     }
 
