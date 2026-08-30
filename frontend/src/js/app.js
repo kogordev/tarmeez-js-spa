@@ -7,6 +7,7 @@ import { renderLoginView } from "/src/js/views/login-view.js"
 import { renderPostDetailView } from "/src/js/views/post-detail-view.js"
 import { renderRegisterView } from "/src/js/views/register-view.js"
 import { renderUserProfileView } from "/src/js/views/user-profile-view.js"
+import { closeImageModal } from "/src/js/components/image-modal.js"
 
 const main = document.createElement("main")
 main.id = "app"
@@ -14,6 +15,7 @@ main.id = "app"
 let cleanup = () => {}
 
 function renderRoute(route) {
+	closeImageModal()
 	cleanup()
 	cleanup = () => {}
 	if (route.protected && !authStore.isAuthenticated()) {

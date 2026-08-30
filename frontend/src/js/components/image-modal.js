@@ -1,6 +1,10 @@
 let imageModal = null
 let closeTimer = null
 
+export function closeImageModal() {
+    imageModal?.close()
+}
+
 function createImageModal() {
     const overlay = document.createElement("div")
     const image = document.createElement("img")
@@ -51,3 +55,5 @@ export function openImageModal(src, alt = "") {
     window.requestAnimationFrame(() => imageModal.overlay.classList.add("image-modal--open"))
     imageModal.closeButton.focus()
 }
+
+window.addEventListener("popstate", closeImageModal)
