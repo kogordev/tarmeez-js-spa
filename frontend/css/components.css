@@ -1,4 +1,4 @@
-.site-header { position: sticky; top: 0; z-index: 10; background: var(--color-header); border-bottom: 1px solid var(--color-line); backdrop-filter: blur(12px); }
+.site-header { position: sticky; top: 0; z-index: 1001; background: var(--color-header); border-bottom: 1px solid var(--color-line); backdrop-filter: blur(12px); }
 .site-header__nav { width: min(100% - 2rem, 980px); min-height: 4.25rem; margin: auto; display: flex; align-items: center; justify-content: space-between; }
 .site-header__home { color: var(--color-ink); font: 700 1.7rem var(--font-display); text-decoration: none; letter-spacing: 0; }
 .site-header__home::first-letter { color: var(--color-accent); }
@@ -87,7 +87,12 @@
     padding: 0.85rem 1.25rem 1.25rem;
     background: var(--color-header);
     border-top: 1px solid var(--color-line);
-    box-shadow: 0 12px 24px var(--color-shadow-strong);
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
     animation: slideDownDrawer 200ms ease-out forwards;
   }
 

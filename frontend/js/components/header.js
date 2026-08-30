@@ -340,7 +340,7 @@ export function renderHeader({ store = authStore, onLogin, onLogout, onNavigate 
             accountAvatar.appendChild(userAvatarIcon.cloneNode(true))
             accountText.textContent = getUserLabel(state.user)
             accountLabel.replaceChildren(accountAvatar, accountText)
-            profileLink.href = `/profile/${encodeURIComponent(state.user?.id || "")}`
+            profileLink.href = `/users/${encodeURIComponent(state.user?.id || "")}`
 
             // Mobile drawer - Logged In
             mobileUserInfo.hidden = false
@@ -351,7 +351,7 @@ export function renderHeader({ store = authStore, onLogin, onLogout, onNavigate 
 
             mobileProfileLink.hidden = false
             mobileProfileLink.style.display = ""
-            mobileProfileLink.href = `/profile/${encodeURIComponent(state.user?.id || "")}`
+            mobileProfileLink.href = `/users/${encodeURIComponent(state.user?.id || "")}`
 
             mobileGithubLink.hidden = false
             mobileGithubLink.style.display = ""
