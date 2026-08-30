@@ -56,9 +56,12 @@
 .error-state__retry { margin-top: var(--space-2); }
 
 .auth-form, .comment-form { display: grid; gap: var(--space-3); max-width: 440px; margin: 4rem auto; padding: var(--space-5); border: 1px solid var(--color-line); border-radius: 12px; background: var(--color-surface); box-shadow: 0 8px 24px rgba(24, 35, 43, 0.06); }
+.auth-form button { width: 100%; }
 .auth-form input, .comment-form textarea { width: 100%; border: 1px solid var(--color-line); border-radius: 8px; padding: 0.8rem 0.9rem; color: var(--color-ink); background: #fbfcfb; transition: border-color 160ms ease, box-shadow 160ms ease; }
 .auth-form input:focus, .comment-form textarea:focus { border-color: var(--color-accent); outline: 3px solid var(--color-accent-soft); }
 .auth-form__prompt { margin: 0; text-align: center; }
+.auth-form__prompt a { color: var(--color-accent-dark); text-decoration: none; }
+.auth-form__prompt a:hover { text-decoration: underline; }
 .comment-form { width: 100%; max-width: none; margin: var(--space-4) 0 0; padding: var(--space-3); }
 .comment-form textarea { min-height: 7rem; resize: vertical; }
 .comment-form button { justify-self: end; }
