@@ -1,5 +1,5 @@
-import { renderErrorState } from "/src/js/components/error-state.js"
-import authService from "/src/js/services/auth-service.js"
+import { renderErrorState } from "../components/error-state.js"
+import authService from "../services/auth-service.js"
 
 function messageFor(response) { return response?.error?.message || "Unable to register." }
 

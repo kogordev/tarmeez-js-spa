@@ -1,4 +1,4 @@
-import routes from "/src/js/router/routes.js"
+import routes from "./routes.js"
 
 function compileRoute(path) {
     const names = []

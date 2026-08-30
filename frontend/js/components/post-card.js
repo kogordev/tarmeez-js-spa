@@ -1,9 +1,9 @@
-import escapeHtml, { autolinkText } from "/src/js/utils/escape-html.js"
-import authStore from "/src/js/store/auth-store.js"
-import { deletePost } from "/src/js/services/posts-service.js"
-import { DEFAULT_AVATAR_FALLBACK, getImageUrl, hasValidImage, setImageFallback } from "/src/js/utils/images.js"
-import { renderConfirmModal } from "/src/js/components/confirm-modal.js"
-import { openImageModal } from "/src/js/components/image-modal.js"
+import escapeHtml, { autolinkText } from "../utils/escape-html.js"
+import authStore from "../store/auth-store.js"
+import { deletePost } from "../services/posts-service.js"
+import { DEFAULT_AVATAR_FALLBACK, getImageUrl, hasValidImage, setImageFallback } from "../utils/images.js"
+import { renderConfirmModal } from "./confirm-modal.js"
+import { openImageModal } from "./image-modal.js"
 
 let activeMenuClose = null
 

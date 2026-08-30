@@ -1,5 +1,5 @@
-import httpClient from "/src/js/services/http-client.js"
-import { appendFormValue, normalizeDataResponse, normalizePage, normalizePost } from "/src/js/utils/api-normalizers.js"
+import httpClient from "./http-client.js"
+import { appendFormValue, normalizeDataResponse, normalizePage, normalizePost } from "../utils/api-normalizers.js"
 
 function pagePath(path, page) {
     const params = new URLSearchParams()

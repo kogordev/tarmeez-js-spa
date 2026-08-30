@@ -1,4 +1,4 @@
-import authStore from "/src/js/store/auth-store.js"
+import authStore from "../store/auth-store.js"
 
 export const API_BASE_URL = "https://tarmeezacademy.com/api/v1"
 

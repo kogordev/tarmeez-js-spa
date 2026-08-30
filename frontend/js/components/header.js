@@ -1,6 +1,6 @@
-import escapeHtml from "/src/js/utils/escape-html.js"
-import authStore from "/src/js/store/auth-store.js"
-import themeController from "/src/js/utils/theme.js"
+import escapeHtml from "../utils/escape-html.js"
+import authStore from "../store/auth-store.js"
+import themeController from "../utils/theme.js"
 
 function setSafeText(element, value) {
     element.innerHTML = escapeHtml(value)

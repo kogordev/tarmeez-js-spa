@@ -1,4 +1,4 @@
-import { renderPostCard } from "/src/js/components/post-card.js"
+import { renderPostCard } from "./post-card.js"
 
 export function renderPostList(posts = [], options = {}) {
     const list = document.createElement("section")

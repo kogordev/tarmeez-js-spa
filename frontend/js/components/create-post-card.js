@@ -1,5 +1,5 @@
-import authStore from "/src/js/store/auth-store.js"
-import { DEFAULT_AVATAR_FALLBACK, getImageUrl, setImageFallback } from "/src/js/utils/images.js"
+import authStore from "../store/auth-store.js"
+import { DEFAULT_AVATAR_FALLBACK, getImageUrl, setImageFallback } from "../utils/images.js"
 
 function getUserLabel(user) {
     return user?.name || user?.username || "there"

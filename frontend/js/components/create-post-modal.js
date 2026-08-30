@@ -1,4 +1,4 @@
-import postsService from "/src/js/services/posts-service.js"
+import postsService from "../services/posts-service.js"
 
 function messageFor(response) {
     return response?.error?.message || "Unable to publish your post."
