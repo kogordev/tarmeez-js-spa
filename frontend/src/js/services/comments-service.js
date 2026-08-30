@@ -1,6 +1,8 @@
 import httpClient from "/src/js/services/http-client.js"
 import { normalizeComment, normalizeDataResponse } from "/src/js/utils/api-normalizers.js"
 
+const commentApiLimitationMessage = "The Tarmeez API does not support comment updates or deletions. Comments can only be created through POST /posts/:postId/comments."
+
 export async function createComment(postId, body) {
     const payload = typeof body === "string" ? { body } : body
     return normalizeDataResponse(
@@ -9,17 +11,13 @@ export async function createComment(postId, body) {
     )
 }
 
-export async function deleteComment(postId, commentId) {
-    if (!postId) {
-        const fallbackResponse = await httpClient.delete(`/comments/${encodeURIComponent(commentId)}`)
-        console.log("DELETE /comments fallback response", { status: fallbackResponse.status, data: fallbackResponse.data })
-        return fallbackResponse
-    }
-
-    const response = await httpClient.delete(`/posts/${encodeURIComponent(postId)}/comments/${encodeURIComponent(commentId)}`)
-    console.log("DELETE /posts/:postId/comments/:commentId response", { status: response.status, data: response.data })
-    return response
+export async function updateComment() {
+    throw new Error(commentApiLimitationMessage)
 }
 
-export const commentsService = { createComment, deleteComment }
+export async function deleteComment() {
+    throw new Error(commentApiLimitationMessage)
+}
+
+export const commentsService = { createComment, updateComment, deleteComment }
 export default commentsService
