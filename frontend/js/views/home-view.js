@@ -12,6 +12,10 @@ function messageFor(response) {
     return response?.error?.message || "Unable to load posts."
 }
 
+function sortByNewest(posts) {
+    return [...posts].sort((a, b) => new Date(b.createdAt || b.id) - new Date(a.createdAt || a.id))
+}
+
 export function renderHomeView(container, { navigate, service = postsService } = {}) {
     let active = true
     let requestId = 0
@@ -72,7 +76,7 @@ export function renderHomeView(container, { navigate, service = postsService } =
 
         const { items, meta, links } = response.data
         hasNextPage = responseHasNextPage(meta, links)
-        list = renderPostList(items, {
+        list = renderPostList(sortByNewest(items), {
             onSelect: (post) => navigate(`/posts/${post.id}`),
             onEdit: (post) => createPostModal?.open(post)
         })
@@ -95,7 +99,7 @@ export function renderHomeView(container, { navigate, service = postsService } =
         }
 
         const { items, meta, links } = response.data
-        const nextList = renderPostList(items, {
+        const nextList = renderPostList(sortByNewest(items), {
             onSelect: (post) => navigate(`/posts/${post.id}`),
             onEdit: (post) => createPostModal?.open(post)
         })

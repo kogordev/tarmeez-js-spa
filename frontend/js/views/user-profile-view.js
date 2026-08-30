@@ -7,6 +7,10 @@ import usersService from "/js/services/users-service.js"
 
 function messageFor(response) { return response?.error?.message || "Unable to load this profile." }
 
+function sortByNewest(posts) {
+    return [...posts].sort((a, b) => new Date(b.createdAt || b.id) - new Date(a.createdAt || a.id))
+}
+
 export function renderUserProfileView(container, { userId, navigate, userService = usersService, postService = postsService } = {}) {
     let active = true
     const editModal = renderCreatePostModal({
@@ -32,7 +36,7 @@ export function renderUserProfileView(container, { userId, navigate, userService
             container.replaceChildren(
                 heading,
                 details,
-                renderPostList(postsResponse.data.items, {
+                renderPostList(sortByNewest(postsResponse.data.items), {
                     onSelect: (post) => navigate(`/posts/${post.id}`),
                     onEdit: (post) => editModal.open(post)
                 }),
