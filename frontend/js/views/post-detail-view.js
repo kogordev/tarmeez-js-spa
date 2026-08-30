@@ -17,10 +17,23 @@ function sameUser(firstUser, secondUser) {
 
 function renderCommentItem(comment = {}) {
     const item = document.createElement("article")
-    const author = comment.author?.name || comment.author?.username || "Anonymous"
+    const authorObj = typeof comment.author === "object" && comment.author !== null
+        ? comment.author
+        : typeof comment.user === "object" && comment.user !== null
+            ? comment.user
+            : {}
+
+    const authorId = authorObj.id ?? authorObj.userId ?? authorObj._id
+    const username = authorObj.username || authorObj.name || (typeof comment.author === "string" ? comment.author : null) || (typeof comment.user === "string" ? comment.user : null) || "Anonymous"
+
     item.className = "comment"
     item.setAttribute("dir", "auto")
-    item.innerHTML = `<strong dir="auto">${escapeHtml(author)}</strong><p dir="auto">${autolinkText(comment.body || "")}</p>`
+
+    const authorMarkup = (authorId !== undefined && authorId !== null && authorId !== "")
+        ? `<a href="#/users/${encodeURIComponent(authorId)}" class="comment-author-link">${escapeHtml(username)}</a>`
+        : `<strong dir="auto" class="comment-author-link">${escapeHtml(username)}</strong>`
+
+    item.innerHTML = `${authorMarkup}<p dir="auto">${autolinkText(comment.body || "")}</p>`
     return item
 }
 
