@@ -200,12 +200,21 @@ export function renderHeader({ store = authStore, onLogin, onLogout, onNavigate 
         registerLink.hidden = authenticated
 
         if (authenticated) {
+            action.style.display = "none"
+            registerLink.style.display = "none"
+            userMenu.style.display = "inline-flex"
+
             accountAvatar.innerHTML = ""
             accountAvatar.appendChild(userAvatarIcon.cloneNode(true))
             accountText.textContent = getUserLabel(state.user)
             accountLabel.replaceChildren(accountAvatar, accountText)
             profileLink.href = `/profile/${encodeURIComponent(state.user?.id || "")}`
         } else {
+            action.style.display = ""
+            registerLink.style.display = ""
+            userMenu.style.display = "none"
+            closeUserDropdown()
+
             accountLabel.replaceChildren(accountAvatar)
             accountText.textContent = ""
         }
