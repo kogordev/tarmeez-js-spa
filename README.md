@@ -122,6 +122,10 @@ The image modal is implemented as a reusable DOM overlay that supports:
 - automatic close on browser history navigation
 - smooth fade-in/fade-out transitions
 
+## Architecture & Diagrams
+
+The frontend architecture and interaction flow are documented in [ARCHITECTURE.md](ARCHITECTURE.md). It includes Mermaid diagrams for the application structure, user journey, navigation lifecycle, and state/data flow.
+
 ## Getting Started / Local Setup
 
 ### Prerequisites

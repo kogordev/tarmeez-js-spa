@@ -1,405 +1,119 @@
-# Tarmeez SPA Architecture
+# Tarmeez Frontend Architecture & Flow Diagrams
 
-## 1. Scope
+This document maps the browser-side execution flow of the Tarmeez SPA using the actual structure in the frontend: a static HTML bootstrap, an app entry module, a custom router, view renderers, and DOM components for the header, post cards, and modal lightbox.
 
-This document defines the architecture for a Vanilla JavaScript single-page application consuming the Tarmeez API. It is an analysis and implementation blueprint only. No application code, routes, dependencies, or API calls are added as part of this document.
+## 1. System Architecture Diagram
 
-The current repository is a plain Express static server with a Vanilla JS frontend. The existing server serves `frontend/` and falls back to `frontend/index.html` for client-side routes. The browser is expected to call the remote API directly unless a later CORS requirement justifies adding an Express proxy.
-
-## 2. API Overview
-
-**Base URL**
-
-```text
-https://tarmeezacademy.com/api/v1
+```mermaid
+graph TD
+    A[frontend/index.html<br/>Bootstrap HTML] --> B[frontend/src/js/app.js<br/>Entry point and root app setup]
+    B --> C[frontend/src/js/router/router.js<br/>Route matching + history APIs]
+    B --> D[frontend/src/js/store/auth-store.js<br/>Auth state]
+    C --> E[frontend/src/js/views/*.js<br/>Home / Login / Register / Detail / Profile]
+    E --> F[frontend/src/js/components/header.js<br/>Header, theme toggle, auth actions]
+    E --> G[frontend/src/js/components/post-card.js<br/>Post cards + image interactions]
+    E --> H[frontend/src/js/components/image-modal.js<br/>Lightbox modal]
+    E --> I[frontend/src/js/services/*.js<br/>Posts / auth / users / comments / tags]
+    F --> J[localStorage<br/>theme + auth persistence]
+    G --> K[DOM rendering<br/>dynamic content injection]
+    H --> L[document.body overlay<br/>image modal layer]
+    I --> M[Tarmeez backend / public API]
+    J --> N[document.documentElement<br/>data-theme attribute]
+    N --> O[frontend/src/css/global.css + components.css<br/>Theme variables and UI styling]
 ```
 
-**API groups**
+## 2. Application User Flow
 
-- Auth
-- User
-- Posts
-- Comments
-- Tags
-
-**Common headers**
-
-```http
-Accept: application/json
-Authorization: Bearer <token>
-Content-Type: application/json
+```mermaid
+flowchart TD
+    A[Page Load] --> B[HTML loads CSS and app.js]
+    B --> C[Theme bootstrap reads localStorage]
+    C --> D{Saved theme exists?}
+    D -- Yes --> E[Apply saved theme to documentElement]
+    D -- No --> F[Use prefers-color-scheme fallback]
+    E --> G[Render header shell]
+    F --> G
+    G --> H[Router resolves current path]
+    H --> I[Fetch posts or route-specific data]
+    I --> J[Render view content]
+    J --> K{User interaction}
+    K -->|Click post image| L[openImageModal(src, alt)]
+    L --> M[Lightbox opens]
+    M --> N{Dismiss modal}
+    N -->|Esc key| O[closeImageModal]
+    N -->|Backdrop click| O
+    N -->|Browser back/forward| O
+    O --> P[Modal hidden and image cleared]
+    K -->|Click email icon| Q[Copy developer email to clipboard]
+    Q --> R[Show toast notification]
+    K -->|Use data-link nav| S[history.pushState + router render]
 ```
 
-`Content-Type: multipart/form-data` is required for upload forms. The browser should set the multipart boundary automatically when a `FormData` object is passed to `fetch`; the client must not manually set that header.
+## 3. SPA Navigation & Event Lifecycle
 
-**Evidence labels**
+```mermaid
+sequenceDiagram
+    autonumber
+    actor User
+    participant UI as DOM UI / Post Card
+    participant Router as router/router.js
+    participant App as app.js
+    participant Modal as image-modal.js
+    participant View as Rendered View
+    participant Browser as Browser History
 
-- **Postman-documented**: visible in the supplied Postman documentation.
-- **Live-observed**: confirmed from a request to the public API.
-- **Inferred**: likely based on naming or normal REST behavior, but not exposed clearly by the documentation.
-- **Unresolved**: must be verified before the corresponding implementation is treated as a stable contract.
+    User->>UI: Clicks a post link or image action
+    UI->>Router: data-link anchor intercepted
+    Router->>Browser: history.pushState({}, "", path)
+    Router->>App: renderLocation()
+    App->>Modal: closeImageModal()
+    Modal->>Modal: Hide stale modal and clear image src
+    App->>View: cleanup() from previous route
+    View-->>View: Remove event listeners and DOM nodes
+    App->>View: renderHomeView / renderPostDetailView / renderUserProfileView
+    View-->>User: New screen is displayed
 
-The Postman collection applies Bearer metadata at collection or folder level in places where the example curl request does not send a token. Auth requirements below follow the request examples and live behavior where available, not inherited display metadata alone.
-
-## 3. Endpoint Inventory
-
-### 3.1 Auth
-
-#### `POST /register`
-
-- **Auth:** Public. The Postman page displays inherited Bearer metadata, but the example request does not send `Authorization`.
-- **Request:** `multipart/form-data`.
-- **Fields:**
-  - `username`: string, required.
-  - `password`: string, required.
-  - `name`: string, required or validation-dependent.
-  - `email`: string, required or validation-dependent.
-  - `image`: optional upload; inferred from the form-data schema and registration design.
-- **Example request:**
-
-```bash
-curl --location 'https://tarmeezacademy.com/api/v1/register' \
-  --header 'Accept: application/json' \
-  --form 'username="yarob"' \
-  --form 'password="123456"' \
-  --form 'name="Yarob"' \
-  --form 'email="yarob.hm@gmail.com"'
+    User->>Browser: Triggers Back or Forward
+    Browser-->>Router: popstate event
+    Router->>App: renderLocation()
+    App->>Modal: closeImageModal()
+    Modal->>Modal: Ensure no orphaned lightbox remains
+    App->>View: cleanup() of previous page
+    App->>View: Re-render matched route
+    View-->>User: Router state and DOM stay in sync
 ```
 
-- **Response:** The Postman example states that there is no response body.
-- **Status:** Not exposed by the published example. Verify success and validation status codes before implementation.
-- **Implementation note:** Submit with `FormData`. Do not assume registration also logs the user in unless the runtime response confirms it.
+## 4. Data & State Management Flow
 
-#### `POST /login`
+```mermaid
+graph LR
+    A[Tarmeez backend / public API] --> B[frontend/src/js/services/*.js<br/>fetch posts, auth, users, tags, comments]
+    B --> C[Normalized JSON response data]
+    C --> D[frontend/src/js/views/*.js<br/>renderHomeView / renderPostDetailView / renderUserProfileView]
+    D --> E[DOM elements<br/>cards, comments, header, modals]
+    E --> F[User actions<br/>click image, login/logout, theme toggle]
 
-- **Auth:** Public. The example request does not send `Authorization`.
-- **Request:** JSON.
-- **Payload:**
+    G[localStorage<br/>theme + auth state] --> H[ThemeController / auth-store]
+    H --> I[document.documentElement data-theme]
+    I --> J[frontend/src/css/global.css + components.css]
 
-```json
-{
-  "username": "yarob",
-  "password": "HelloWorld"
-}
+    F --> K[openImageModal / closeImageModal]
+    K --> L[image-modal overlay in document.body]
+    B --> M[Browser fetch + JSON parsing]
+    M --> D
 ```
 
-- **Response:** The Postman example states that there is no response body, which conflicts with the normal need for a login token.
-- **Token shape:** Unresolved. Verify the successful response and identify the exact token field before implementing persistent authentication.
-- **Implementation note:** The API client must not hard-code a response shape based only on the empty example in the documentation.
-
-#### `POST /logout`
-
-- **Auth:** Bearer token required according to the request authorization settings.
-- **Displayed request body:**
-
-```json
-{
-  "username": "yarob",
-  "password": "HelloWorld"
-}
-```
-
-This body appears to be inherited or stale metadata because logout should normally use the bearer token and does not need credentials in the body.
-
-- **Response:** The Postman example states that there is no response body.
-- **Status:** Not exposed by the published example.
-- **Implementation note:** Send the bearer token, tolerate an empty success response, and clear the local session regardless of whether a response body is returned.
-
-### 3.2 Users
-
-#### `GET /users?page={page}`
-
-- **Auth:** Public; live-observed without authentication.
-- **Query parameters:**
-  - `page`: numeric page number. Optional; defaults to the first page.
-- **Response:** Paginated Laravel-style envelope.
-
-```json
-{
-  "data": [
-    {
-      "id": 1,
-      "username": "abd19",
-      "name": "Example User",
-      "email": "user@example.com",
-      "profile_image": "https://example.com/images/users/profile.jpg",
-      "posts_count": 3,
-      "comments_count": 13
-    }
-  ],
-  "links": {
-    "first": "https://tarmeezacademy.com/api/v1/users?page=1",
-    "last": "https://tarmeezacademy.com/api/v1/users?page=10",
-    "prev": null,
-    "next": "https://tarmeezacademy.com/api/v1/users?page=2"
-  },
-  "meta": {
-    "current_page": 1,
-    "last_page": 10,
-    "per_page": 15,
-    "from": 1,
-    "to": 15,
-    "total": 150
-  }
-}
-```
-
-The exact totals vary with live data. The observed page size was 15.
-
-#### `GET /users/{userId}`
-
-- **Auth:** Public; live-observed without authentication.
-- **Path parameters:**
-  - `userId`: numeric user identifier.
-- **Response:** `{ "data": User }`.
-- **User fields:** `id`, `username`, `name`, `email`, `profile_image`, `posts_count`, `comments_count`, and optional `created_at`/`updated_at` fields. Nullable and missing values must be supported.
-
-### 3.3 Posts
-
-#### `GET /posts?page={page}`
-
-- **Auth:** Public; live-observed without authentication.
-- **Query parameters:**
-  - `page`: numeric page number. Optional; defaults to the first page.
-- **Response:** Paginated Laravel-style envelope with `data`, `links`, and `meta`.
-- **Observed pagination:** 15 posts per page. The envelope includes `current_page`, `last_page`, `per_page`, `from`, `to`, `total`, and navigation links.
-- **List item shape:**
-
-```json
-{
-  "id": 20784,
-  "title": "Example title",
-  "body": "Example body",
-  "author": {
-    "id": 1,
-    "username": "example-user",
-    "name": "Example User",
-    "profile_image": {}
-  },
-  "image": "https://tarmeezacademy.com/images/posts/example.jpg",
-  "tags": [],
-  "created_at": "16 hours ago",
-  "comments_count": 0
-}
-```
-
-`title` may be null. `image` may be a URL, an empty object, null, or absent.
-
-#### `GET /posts/{postId}`
-
-- **Auth:** Public; live-observed without authentication.
-- **Path parameters:**
-  - `postId`: numeric post identifier.
-- **Response:** `{ "data": Post }`.
-- **Additional detail data:** Post details include embedded `comments`.
-
-```json
-{
-  "data": {
-    "id": 20784,
-    "title": "Example title",
-    "body": "Example body",
-    "author": {},
-    "image": {},
-    "tags": [],
-    "created_at": "16 hours ago",
-    "comments_count": 1,
-    "comments": [
-      {
-        "id": 2,
-        "body": "Example comment",
-        "author": {}
-      }
-    ]
-  }
-}
-```
-
-#### `POST /posts`
-
-- **Auth:** Bearer token required.
-- **Request:** Likely `multipart/form-data` because posts can include an image. The exact published body is not exposed reliably.
-- **Likely fields:**
-  - `title`: string, possibly nullable.
-  - `body`: string, required.
-  - `image`: optional upload.
-  - Tag fields: unresolved; do not assume a field name until verified.
-- **Response/status:** The exact response body and success status are not exposed by the published example. A created resource and HTTP 201 are reasonable expectations, not guaranteed API facts.
-- **Implementation note:** Verify field names, required values, image behavior, tags, and response shape before building the create-post form.
-
-#### `DELETE /posts/{postId}`
-
-- **Auth:** Bearer token required. Ownership authorization is expected.
-- **Path parameters:**
-  - `postId`: numeric post identifier.
-- **Response/status:** Exact success body and status are undocumented. Support either an empty response such as 204 or a JSON success message.
-- **Failure cases:** Expect possible 401 unauthenticated, 403 not owner, and 404 missing post responses, but verify exact API behavior.
-
-#### Post update operations
-
-`PUT /posts/{postId}` and `PATCH /posts/{postId}` were not confirmed by the rendered collection. They are excluded from the initial architecture contract until the collection is directly verified.
-
-#### Post filtering
-
-Possible query filters such as `tag` or `user_id` are not guaranteed. Live probes did not establish that they filter results. The service layer may accept future query parameters, but the first implementation must not expose filtering UI as a confirmed feature without verification.
-
-### 3.4 Comments
-
-#### `POST /posts/{postId}/comments`
-
-- **Auth:** Bearer token required.
-- **Path parameters:**
-  - `postId`: numeric post identifier.
-- **Payload:** A `body` field is expected. Whether the endpoint requires JSON or form encoding is unresolved.
-
-Likely JSON form:
-
-```json
-{
-  "body": "Example comment"
-}
-```
-
-- **Response/status:** A created comment and HTTP 201 are reasonable expectations, but the published documentation does not expose a reliable response or status.
-- **Implementation note:** Verify encoding and response shape before finalizing `comments-service.js`.
-
-#### `DELETE /comments/{commentId}`
-
-- **Auth:** Bearer token required. Ownership authorization is expected.
-- **Path parameters:**
-  - `commentId`: numeric comment identifier.
-- **Response/status:** Exact success body and status are undocumented. Support an empty response or JSON success message.
-
-#### `GET /posts/{postId}/comments`
-
-This route is not a first-implementation dependency. A live probe returned HTTP 500. Post detail responses already embed comments, so the initial application should read comments from `GET /posts/{postId}`.
-
-### 3.5 Tags
-
-#### `GET /tags`
-
-- **Auth:** Public; live-observed without authentication.
-- **Parameters:** None observed.
-- **Response:** Non-paginated data envelope.
-
-```json
-{
-  "data": [
-    {
-      "name": "sports",
-      "arabic_name": "Arabic label",
-      "description": "everything about sports"
-    }
-  ]
-}
-```
-
-The API returned four sample tags in the live response. The data set may change.
-
-#### `GET /tags/{tag}`
-
-This route is not part of the guaranteed contract. A live probe of `/tags/sports` returned HTTP 404. A tag directory may link to filtered posts only after the API's supported filtering convention is verified.
-
-## 4. Domain Models
-
-The UI should consume normalized models so components do not need to understand every API inconsistency.
-
-### User
-
-```text
-User {
-  id: number
-  username: string
-  name: string
-  email: string | null
-  profileImageUrl: string | null
-  postsCount: number | null
-  commentsCount: number | null
-  createdAt: string | null
-  updatedAt: string | null
-}
-```
-
-### Post
-
-```text
-Post {
-  id: number
-  title: string | null
-  body: string
-  author: User | null
-  imageUrl: string | null
-  tags: Tag[]
-  createdAt: string | null
-  commentsCount: number
-  comments: Comment[] | null
-}
-```
-
-### Comment
-
-```text
-Comment {
-  id: number
-  body: string
-  author: User | null
-}
-```
-
-### Tag
-
-```text
-Tag {
-  name: string
-  arabicName: string | null
-  description: string | null
-}
-```
-
-Normalization must tolerate `{}`, null, missing image fields, unusable localhost URLs, null titles, and either ISO or human-readable timestamps.
-
-## 5. SPA Routes and Pages
-
-The router uses the History API and maps browser paths to route-level views.
-
-| Route | Access | View responsibility | Primary API calls |
-|---|---|---|---|
-| `/` | Public | Redirect or render the post feed. | `GET /posts` |
-| `/posts` | Public | Paginated feed, post cards, loading/empty/error states, pagination. | `GET /posts?page={page}` |
-| `/posts/:id` | Public | Post detail, author, tags, image, embedded comments, and authenticated mutation controls. | `GET /posts/{postId}` |
-| `/users` | Public | Paginated user directory. | `GET /users?page={page}` |
-| `/users/:id` | Public | User profile summary and counts. Associated posts are not assumed until a supported API query is verified. | `GET /users/{userId}` |
-| `/tags` | Public | Tag directory with names and descriptions. | `GET /tags` |
-| `/login` | Public | Username/password authentication form. | `POST /login` |
-| `/register` | Public | Registration form with optional image upload. | `POST /register` |
-| `/settings` | Authenticated | Account actions such as logout. No profile editing is promised. | `POST /logout` |
-| `/404` | Public | Unknown-route state with navigation back to a known page. | None |
-
-Create-post UI may be added as an authenticated modal or route after the exact `POST /posts` contract is verified. It is not assigned a guaranteed route yet.
-
-## 6. UI Components
-
-Components render DOM and emit user-intent events. They do not call `fetch` or import resource services directly.
-
-### Application shell
-
-- `AppShell`: mounts the active view and shared layout.
-- `Header`: navigation, authentication state, user menu, and logout action.
-- `Navigation`: links using `data-link` or router helpers so navigation stays client-side.
-
-### Resource components
-
-- `PostList`: renders a collection of post cards.
-- `PostCard`: summary title, body excerpt, author, image, tags, timestamp, and comment count.
-- `PostDetail`: full post body, author link, tags, image, comments, and mutation actions.
-- `UserCard`: compact user summary for the directory.
-- `UserProfile`: user identity and activity counts.
-- `TagList`: collection of tags and descriptions.
-- `TagBadge`: compact tag representation.
-- `CommentList`: comments embedded in post detail.
-- `CommentForm`: authenticated form for creating a comment.
-
-### Form and state components
+## Architectural Notes
+
+- The bootstrap is [frontend/index.html](frontend/index.html), which loads the CSS bundle and the module entry.
+- [frontend/src/js/app.js](frontend/src/js/app.js) mounts the main app area, initializes the router, and renders the sticky header.
+- [frontend/src/js/router/router.js](frontend/src/js/router/router.js) owns route matching, click interception on elements with data-link, and browser history updates.
+- [frontend/src/js/components/header.js](frontend/src/js/components/header.js) handles theme toggling, auth state display, logout/login actions, and the email copy interaction.
+- [frontend/src/js/components/post-card.js](frontend/src/js/components/post-card.js) renders each post, attaches image preview behavior, and contains the interaction controls for detail and action menus.
+- [frontend/src/js/components/image-modal.js](frontend/src/js/components/image-modal.js) manages the modal lifecycle, including Escape keys, backdrop dismissal, and route-driven cleanup.
+- Theme persistence is shared between the bootstrap script in [frontend/index.html](frontend/index.html) and the controller in [frontend/src/js/utils/theme.js](frontend/src/js/utils/theme.js); styling values are defined in [frontend/src/css/global.css](frontend/src/css/global.css) and [frontend/src/css/components.css](frontend/src/css/components.css).
+
+This file intentionally documents the frontend structure and flow instead of modifying any source code behavior.
 
 - `AuthForm`: shared validation and submission presentation for login/register variants.
 - `Pagination`: consumes pagination metadata and emits page changes.
