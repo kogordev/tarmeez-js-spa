@@ -3,11 +3,12 @@
 .site-header__home { color: var(--color-ink); font: 700 1.7rem var(--font-display); text-decoration: none; letter-spacing: 0; }
 .site-header__home::first-letter { color: var(--color-accent); }
 .site-header__account { position: relative; display: flex; align-items: center; gap: var(--space-3); }
-.site-header__user { display: inline-flex; align-items: center; justify-content: center; gap: 0.45rem; padding: 0.3rem 0.55rem; border: 1px solid var(--color-line); border-radius: 999px; background: var(--color-surface); color: var(--color-muted); cursor: pointer; font-size: 0.85rem; }
+.site-header__user { position: relative; }
+.site-header__user-trigger { display: inline-flex; align-items: center; justify-content: center; gap: 0.45rem; padding: 0.3rem 0.55rem; border: 1px solid var(--color-line); border-radius: 999px; background: var(--color-surface); color: var(--color-muted); cursor: pointer; font-size: 0.85rem; }
 .site-header__user-avatar { display: inline-flex; align-items: center; justify-content: center; width: 1.5rem; height: 1.5rem; border-radius: 50%; color: var(--color-ink); background: var(--color-accent-soft); }
 .site-header__user-avatar svg { display: block; width: 0.9rem; height: 0.9rem; }
 .site-header__user-label { white-space: nowrap; }
-.user-dropdown { position: absolute; top: calc(100% - 0.3rem); right: 0; z-index: 100; display: flex; min-width: 150px; flex-direction: column; padding: 0.35rem; border: 1px solid var(--color-line); border-radius: 8px; background: var(--color-surface); box-shadow: 0 12px 24px var(--color-shadow-strong); }
+.user-dropdown { position: absolute; top: 100%; right: 0; z-index: 100; display: flex; min-width: 150px; flex-direction: column; margin-top: 8px; padding: 0.35rem; border: 1px solid var(--color-line); border-radius: 8px; background: var(--color-surface); box-shadow: 0 12px 24px var(--color-shadow-strong); }
 .user-dropdown[hidden] { display: none; }
 .user-dropdown__action { width: 100%; border: 0; border-radius: 5px; padding: 0.65rem 0.75rem; color: var(--color-ink); background: transparent; cursor: pointer; font: inherit; text-align: left; text-decoration: none; }
 .user-dropdown__action:hover, .user-dropdown__action:focus-visible { background: var(--color-accent-soft); outline: none; }

@@ -33,6 +33,7 @@ export function renderHeader({ store = authStore, onLogin, onLogout, onNavigate 
     const nav = document.createElement("nav")
     const homeLink = document.createElement("a")
     const account = document.createElement("div")
+    const userMenu = document.createElement("div")
     const accountLabel = document.createElement("button")
     const accountAvatar = document.createElement("span")
     const accountText = document.createElement("span")
@@ -63,8 +64,9 @@ export function renderHeader({ store = authStore, onLogin, onLogout, onNavigate 
     homeLink.dataset.link = ""
     setSafeText(homeLink, "Tarmeez")
     account.className = "site-header__account"
+    userMenu.className = "site-header__user"
     accountLabel.type = "button"
-    accountLabel.className = "site-header__user"
+    accountLabel.className = "site-header__user-trigger"
     accountLabel.setAttribute("aria-expanded", "false")
     accountAvatar.className = "site-header__user-avatar"
     accountText.className = "site-header__user-label"
@@ -192,7 +194,7 @@ export function renderHeader({ store = authStore, onLogin, onLogout, onNavigate 
 
     function update(state = store.getState()) {
         const authenticated = Boolean(state.isAuthenticated)
-        accountLabel.hidden = !authenticated
+        userMenu.hidden = !authenticated
         userDropdown.hidden = true
         action.hidden = authenticated
         registerLink.hidden = authenticated
@@ -205,13 +207,13 @@ export function renderHeader({ store = authStore, onLogin, onLogout, onNavigate 
             profileLink.href = `/profile/${encodeURIComponent(state.user?.id || "")}`
         } else {
             accountLabel.replaceChildren(accountAvatar)
-            accountLabel.hidden = true
             accountText.textContent = ""
         }
     }
 
     nav.append(homeLink, account)
-    account.append(themeToggle, githubLink, emailLink, accountLabel, userDropdown, action, registerLink)
+    userMenu.append(accountLabel, userDropdown)
+    account.append(themeToggle, githubLink, emailLink, userMenu, action, registerLink)
     accountLabel.append(accountAvatar, accountText)
     header.append(nav)
     update()
