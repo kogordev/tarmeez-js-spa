@@ -1,5 +1,5 @@
-import httpClient from "./http-client.js"
-import { normalizeComment, normalizeDataResponse } from "../utils/api-normalizers.js"
+import httpClient from "/js/services/http-client.js"
+import { normalizeComment, normalizeDataResponse } from "/js/utils/api-normalizers.js"
 
 const commentApiLimitationMessage = "The Tarmeez API does not support comment updates or deletions. Comments can only be created through POST /posts/:postId/comments."
 

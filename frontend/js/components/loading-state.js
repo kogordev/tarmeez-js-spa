@@ -1,4 +1,4 @@
-import escapeHtml from "../utils/escape-html.js"
+import escapeHtml from "/js/utils/escape-html.js"
 
 export function renderLoadingState(message = "Loading...") {
     const state = document.createElement("div")

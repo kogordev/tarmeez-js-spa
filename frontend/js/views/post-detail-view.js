@@ -1,11 +1,11 @@
-import { renderErrorState } from "../components/error-state.js"
-import { renderLoadingState } from "../components/loading-state.js"
-import { renderPostCard } from "../components/post-card.js"
-import { renderCreatePostModal } from "../components/create-post-modal.js"
-import authStore from "../store/auth-store.js"
-import commentsService from "../services/comments-service.js"
-import postsService from "../services/posts-service.js"
-import escapeHtml, { autolinkText } from "../utils/escape-html.js"
+import { renderErrorState } from "/js/components/error-state.js"
+import { renderLoadingState } from "/js/components/loading-state.js"
+import { renderPostCard } from "/js/components/post-card.js"
+import { renderCreatePostModal } from "/js/components/create-post-modal.js"
+import authStore from "/js/store/auth-store.js"
+import commentsService from "/js/services/comments-service.js"
+import postsService from "/js/services/posts-service.js"
+import escapeHtml, { autolinkText } from "/js/utils/escape-html.js"
 
 function messageFor(response) { return response?.error?.message || "Unable to load this post." }
 

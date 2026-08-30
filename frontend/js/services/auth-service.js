@@ -1,6 +1,6 @@
-import httpClient from "./http-client.js"
-import authStore from "../store/auth-store.js"
-import { appendFormValue, normalizeUser } from "../utils/api-normalizers.js"
+import httpClient from "/js/services/http-client.js"
+import authStore from "/js/store/auth-store.js"
+import { appendFormValue, normalizeUser } from "/js/utils/api-normalizers.js"
 
 function toFormData(input) {
     if (input instanceof FormData) {

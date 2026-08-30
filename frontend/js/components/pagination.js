@@ -1,5 +1,5 @@
-import escapeHtml from "../utils/escape-html.js"
-import { renderLoadingState } from "./loading-state.js"
+import escapeHtml from "/js/utils/escape-html.js"
+import { renderLoadingState } from "/js/components/loading-state.js"
 
 function setSafeText(element, value) {
     element.innerHTML = escapeHtml(value)

@@ -1,9 +1,9 @@
-import { renderErrorState } from "../components/error-state.js"
-import { renderLoadingState } from "../components/loading-state.js"
-import { renderPostList } from "../components/post-list.js"
-import { renderCreatePostModal } from "../components/create-post-modal.js"
-import postsService from "../services/posts-service.js"
-import usersService from "../services/users-service.js"
+import { renderErrorState } from "/js/components/error-state.js"
+import { renderLoadingState } from "/js/components/loading-state.js"
+import { renderPostList } from "/js/components/post-list.js"
+import { renderCreatePostModal } from "/js/components/create-post-modal.js"
+import postsService from "/js/services/posts-service.js"
+import usersService from "/js/services/users-service.js"
 
 function messageFor(response) { return response?.error?.message || "Unable to load this profile." }
 

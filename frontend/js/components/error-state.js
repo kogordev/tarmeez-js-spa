@@ -1,4 +1,4 @@
-import escapeHtml from "../utils/escape-html.js"
+import escapeHtml from "/js/utils/escape-html.js"
 
 export function renderErrorState(message = "Something went wrong.", { onRetry } = {}) {
     const state = document.createElement("div")
