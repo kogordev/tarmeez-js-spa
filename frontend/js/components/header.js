@@ -1,5 +1,6 @@
 import escapeHtml from "/js/utils/escape-html.js"
 import authStore from "/js/store/auth-store.js"
+import authService from "/js/services/auth-service.js"
 import themeController from "/js/utils/theme.js"
 
 function setSafeText(element, value) {
@@ -10,12 +11,34 @@ function getUserLabel(user) {
     return user?.name || user?.username || "Account"
 }
 
+function createAuthIcon(pathData) {
+    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg")
+    const path = document.createElementNS("http://www.w3.org/2000/svg", "path")
+
+    svg.setAttribute("viewBox", "0 0 24 24")
+    svg.setAttribute("aria-hidden", "true")
+    svg.classList.add("site-header__auth-icon")
+    path.setAttribute("d", pathData)
+    path.setAttribute("fill", "none")
+    path.setAttribute("stroke", "currentColor")
+    path.setAttribute("stroke-width", "1.9")
+    path.setAttribute("stroke-linecap", "round")
+    path.setAttribute("stroke-linejoin", "round")
+    svg.appendChild(path)
+    return svg
+}
+
 export function renderHeader({ store = authStore, onLogin, onLogout, onNavigate } = {}) {
     const header = document.createElement("header")
     const nav = document.createElement("nav")
     const homeLink = document.createElement("a")
     const account = document.createElement("div")
-    const accountLabel = document.createElement("span")
+    const accountLabel = document.createElement("button")
+    const accountAvatar = document.createElement("span")
+    const accountText = document.createElement("span")
+    const userDropdown = document.createElement("div")
+    const profileLink = document.createElement("a")
+    const logoutButton = document.createElement("button")
     const themeToggle = document.createElement("button")
     const themeIcon = document.createElement("span")
     const themeLabel = document.createElement("span")
@@ -26,7 +49,12 @@ export function renderHeader({ store = authStore, onLogin, onLogout, onNavigate 
     const emailIcon = document.createElementNS("http://www.w3.org/2000/svg", "svg")
     const emailPath = document.createElementNS("http://www.w3.org/2000/svg", "path")
     const action = document.createElement("button")
+    const actionIcon = createAuthIcon("M10 17V21H3V3H10V7M15 7L21 12L15 17M21 12H7")
+    const actionLabel = document.createElement("span")
     const registerLink = document.createElement("a")
+    const registerIcon = createAuthIcon("M16 19v-1a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v1M9.5 10.5A3.5 3.5 0 1 0 9.5 3.5a3.5 3.5 0 0 0 0 7ZM19 8V15M16 11.5H22")
+    const registerLabel = document.createElement("span")
+    const userAvatarIcon = createAuthIcon("M20 21a8 8 0 1 0-16 0M12 12a4 4 0 1 0-4-4 4 4 0 0 0 4 4Z")
 
     header.className = "site-header"
     nav.className = "site-header__nav"
@@ -35,7 +63,20 @@ export function renderHeader({ store = authStore, onLogin, onLogout, onNavigate 
     homeLink.dataset.link = ""
     setSafeText(homeLink, "Tarmeez")
     account.className = "site-header__account"
+    accountLabel.type = "button"
     accountLabel.className = "site-header__user"
+    accountLabel.setAttribute("aria-expanded", "false")
+    accountAvatar.className = "site-header__user-avatar"
+    accountText.className = "site-header__user-label"
+    userDropdown.className = "user-dropdown"
+    userDropdown.hidden = true
+    profileLink.className = "user-dropdown__action"
+    profileLink.dataset.link = ""
+    profileLink.textContent = "Profile"
+    logoutButton.type = "button"
+    logoutButton.className = "user-dropdown__action"
+    logoutButton.textContent = "Log out"
+    userDropdown.append(profileLink, logoutButton)
     themeToggle.type = "button"
     themeToggle.className = "site-header__theme"
     themeIcon.className = "site-header__theme-icon"
@@ -88,17 +129,18 @@ export function renderHeader({ store = authStore, onLogin, onLogout, onNavigate 
     })
 
     action.type = "button"
-    action.className = "site-header__action"
-    const actionLabel = document.createElement("span")
-    actionLabel.className = "site-header__action-label"
+    action.className = "site-header__action site-header__auth-button"
+    actionIcon.classList.add("site-header__auth-icon")
+    actionLabel.className = "site-header__auth-label site-header__action-label"
+    actionLabel.textContent = "Log in"
+    action.append(actionIcon, actionLabel)
 
-    registerLink.className = "site-header__action site-header__register"
+    registerLink.className = "site-header__action site-header__register site-header__auth-button"
     registerLink.href = "/register"
     registerLink.dataset.link = ""
-    const registerLabel = document.createElement("span")
-    registerLabel.className = "site-header__register-label"
+    registerLabel.className = "site-header__auth-label site-header__register-label"
     registerLabel.textContent = "Register"
-    registerLink.appendChild(registerLabel)
+    registerLink.append(registerIcon, registerLabel)
 
     homeLink.addEventListener("click", (event) => {
         if (onNavigate) {
@@ -107,18 +149,32 @@ export function renderHeader({ store = authStore, onLogin, onLogout, onNavigate 
         }
     })
 
-    action.addEventListener("click", () => {
-        const state = store.getState()
-        if (state.isAuthenticated) {
-            if (onLogout) {
-                onLogout()
-            } else {
-                store.clear()
-            }
-        } else if (onLogin) {
-            onLogin()
-        }
+    action.addEventListener("click", () => onLogin?.())
+
+    function closeUserDropdown() {
+        userDropdown.hidden = true
+        accountLabel.setAttribute("aria-expanded", "false")
+    }
+
+    accountLabel.addEventListener("click", () => {
+        const isOpen = !userDropdown.hidden
+        userDropdown.hidden = isOpen
+        accountLabel.setAttribute("aria-expanded", String(!isOpen))
     })
+
+    profileLink.addEventListener("click", () => closeUserDropdown())
+
+    logoutButton.addEventListener("click", async () => {
+        closeUserDropdown()
+        await authService.logout()
+    })
+
+    const onDocumentClick = (event) => {
+        if (!account.contains(event.target)) {
+            closeUserDropdown()
+        }
+    }
+    document.addEventListener("click", onDocumentClick)
 
     themeToggle.addEventListener("click", () => {
         themeController.toggle()
@@ -137,15 +193,26 @@ export function renderHeader({ store = authStore, onLogin, onLogout, onNavigate 
     function update(state = store.getState()) {
         const authenticated = Boolean(state.isAuthenticated)
         accountLabel.hidden = !authenticated
+        userDropdown.hidden = true
+        action.hidden = authenticated
         registerLink.hidden = authenticated
-        action.dataset.authenticated = String(authenticated)
-        setSafeText(accountLabel, authenticated ? getUserLabel(state.user) : "")
-        actionLabel.textContent = authenticated ? "Log out" : "Log in"
-        action.replaceChildren(actionLabel)
+
+        if (authenticated) {
+            accountAvatar.innerHTML = ""
+            accountAvatar.appendChild(userAvatarIcon.cloneNode(true))
+            accountText.textContent = getUserLabel(state.user)
+            accountLabel.replaceChildren(accountAvatar, accountText)
+            profileLink.href = `/profile/${encodeURIComponent(state.user?.id || "")}`
+        } else {
+            accountLabel.replaceChildren(accountAvatar)
+            accountLabel.hidden = true
+            accountText.textContent = ""
+        }
     }
 
     nav.append(homeLink, account)
-    account.append(themeToggle, githubLink, emailLink, accountLabel, action, registerLink)
+    account.append(themeToggle, githubLink, emailLink, accountLabel, userDropdown, action, registerLink)
+    accountLabel.append(accountAvatar, accountText)
     header.append(nav)
     update()
     updateTheme()
@@ -156,6 +223,7 @@ export function renderHeader({ store = authStore, onLogin, onLogout, onNavigate 
     header.destroy = () => {
         unsubscribe()
         document.documentElement.removeEventListener("themechange", onThemeChange)
+        document.removeEventListener("click", onDocumentClick)
     }
     return header
 }
