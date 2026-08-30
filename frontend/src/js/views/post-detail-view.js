@@ -5,7 +5,7 @@ import { renderCreatePostModal } from "/src/js/components/create-post-modal.js"
 import authStore from "/src/js/store/auth-store.js"
 import commentsService from "/src/js/services/comments-service.js"
 import postsService from "/src/js/services/posts-service.js"
-import escapeHtml from "/src/js/utils/escape-html.js"
+import escapeHtml, { autolinkText } from "/src/js/utils/escape-html.js"
 
 function messageFor(response) { return response?.error?.message || "Unable to load this post." }
 
@@ -20,7 +20,7 @@ function renderCommentItem(comment = {}) {
     const author = comment.author?.name || comment.author?.username || "Anonymous"
     item.className = "comment"
     item.setAttribute("dir", "auto")
-    item.innerHTML = `<strong dir="auto">${escapeHtml(author)}</strong><p dir="auto">${escapeHtml(comment.body || "")}</p>`
+    item.innerHTML = `<strong dir="auto">${escapeHtml(author)}</strong><p dir="auto">${autolinkText(comment.body || "")}</p>`
     return item
 }
 
