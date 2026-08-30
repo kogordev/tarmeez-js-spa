@@ -165,6 +165,16 @@ http://localhost:5600
 
 This project intentionally avoids a framework and instead uses a direct DOM-first approach. That makes it easy to follow for learning, debugging, and customizing, while still supporting modern UI behaviors such as theming, route handling, and modal overlays.
 
+---
+
+## 🤖 Built with AI Collaboration
+
+This project was developed through a collaborative AI-driven workflow:
+
+- **AI Architecture & Prompt Engineering:** Prompts, structural decision-making, code reviews, and solution designs were conceptualized and crafted using **Gemini (Flash)**.
+- **Autonomous Execution & Coding:** Code generation, file patches, testing, and Git commits were autonomously executed via **Roo Code** running **GitHub Copilot** model.
+- **Lead Developer & Supervisor:** Built and directed by [kogordev](https://github.com/kogordev).
+
 ## License
 
 This project is distributed under the ISC license as defined in `package.json`.
