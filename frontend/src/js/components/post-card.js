@@ -3,6 +3,7 @@ import authStore from "/src/js/store/auth-store.js"
 import { deletePost } from "/src/js/services/posts-service.js"
 import { DEFAULT_AVATAR_FALLBACK, getImageUrl, hasValidImage, setImageFallback } from "/src/js/utils/images.js"
 import { renderConfirmModal } from "/src/js/components/confirm-modal.js"
+import { openImageModal } from "/src/js/components/image-modal.js"
 
 let activeMenuClose = null
 
@@ -104,6 +105,10 @@ export function renderPostCard(post = {}, { onSelect, onEdit, onDelete, isDetail
     setSafeText(body, post.body || "")
     postImage.className = "post-card__image"
     postImage.alt = post.title ? `${post.title} image` : "Post image"
+    postImage.addEventListener("click", (event) => {
+        event.stopPropagation()
+        openImageModal(postImage.currentSrc || postImage.src, postImage.alt)
+    })
     postImage.addEventListener("error", setImageFallback)
     if (hasValidImage(post.imageUrl)) {
         postImage.src = getImageUrl(post.imageUrl)
