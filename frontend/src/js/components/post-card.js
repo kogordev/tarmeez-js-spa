@@ -1,4 +1,4 @@
-import escapeHtml from "/src/js/utils/escape-html.js"
+import escapeHtml, { autolinkText } from "/src/js/utils/escape-html.js"
 import authStore from "/src/js/store/auth-store.js"
 import { deletePost } from "/src/js/services/posts-service.js"
 import { DEFAULT_AVATAR_FALLBACK, getImageUrl, hasValidImage, setImageFallback } from "/src/js/utils/images.js"
@@ -9,6 +9,10 @@ let activeMenuClose = null
 
 function setSafeText(element, value) {
     element.innerHTML = escapeHtml(value)
+}
+
+function setAutolinkedText(element, value) {
+    element.innerHTML = autolinkText(value)
 }
 
 function formatTimestamp(value) {
@@ -102,7 +106,7 @@ export function renderPostCard(post = {}, { onSelect, onEdit, onDelete, isDetail
     title.append(titleLink)
     body.className = "post-card__body"
     body.setAttribute("dir", "auto")
-    setSafeText(body, post.body || "")
+    setAutolinkedText(body, post.body || "")
     postImage.className = "post-card__image"
     postImage.alt = post.title ? `${post.title} image` : "Post image"
     postImage.addEventListener("click", (event) => {
