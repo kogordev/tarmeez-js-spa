@@ -1,6 +1,6 @@
 {
-  "outputDirectory": "frontend/src",
   "rewrites": [
-    { "source": "/(.*)", "destination": "/index.html" }
+    { "source": "/", "destination": "/frontend/src/index.html" },
+    { "source": "/((?!src/|assets/|components/|js/|css/|favicon).*)", "destination": "/frontend/src/index.html" }
   ]
 }
