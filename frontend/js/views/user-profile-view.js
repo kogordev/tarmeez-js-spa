@@ -8,7 +8,7 @@ import usersService from "/js/services/users-service.js"
 function messageFor(response) { return response?.error?.message || "Unable to load this profile." }
 
 function sortByNewest(posts) {
-    return [...posts].sort((a, b) => new Date(b.createdAt || b.id) - new Date(a.createdAt || a.id))
+    return [...posts].sort((a, b) => (Number(b.id) || 0) - (Number(a.id) || 0))
 }
 
 export function renderUserProfileView(container, { userId, navigate, userService = usersService, postService = postsService } = {}) {

@@ -13,7 +13,7 @@ function messageFor(response) {
 }
 
 function sortByNewest(posts) {
-    return [...posts].sort((a, b) => new Date(b.createdAt || b.id) - new Date(a.createdAt || a.id))
+    return [...posts].sort((a, b) => (Number(b.id) || 0) - (Number(a.id) || 0))
 }
 
 export function renderHomeView(container, { navigate, service = postsService } = {}) {
