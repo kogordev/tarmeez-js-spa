@@ -18,6 +18,7 @@ export function renderHeader({ store = authStore, onLogin, onLogout, onNavigate 
     const accountLabel = document.createElement("span")
     const themeToggle = document.createElement("button")
     const themeIcon = document.createElement("span")
+    const themeLabel = document.createElement("span")
     const githubLink = document.createElement("a")
     const githubIcon = document.createElementNS("http://www.w3.org/2000/svg", "svg")
     const githubPath = document.createElementNS("http://www.w3.org/2000/svg", "path")
@@ -39,6 +40,7 @@ export function renderHeader({ store = authStore, onLogin, onLogout, onNavigate 
     themeToggle.className = "site-header__theme"
     themeIcon.className = "site-header__theme-icon"
     themeIcon.setAttribute("aria-hidden", "true")
+    themeLabel.className = "site-header__theme-label"
 
     githubLink.className = "site-header__external-link"
     githubLink.href = "https://github.com/kogordev"
@@ -87,10 +89,16 @@ export function renderHeader({ store = authStore, onLogin, onLogout, onNavigate 
 
     action.type = "button"
     action.className = "site-header__action"
+    const actionLabel = document.createElement("span")
+    actionLabel.className = "site-header__action-label"
+
     registerLink.className = "site-header__action site-header__register"
     registerLink.href = "/register"
     registerLink.dataset.link = ""
-    setSafeText(registerLink, "Register")
+    const registerLabel = document.createElement("span")
+    registerLabel.className = "site-header__register-label"
+    registerLabel.textContent = "Register"
+    registerLink.appendChild(registerLabel)
 
     homeLink.addEventListener("click", (event) => {
         if (onNavigate) {
@@ -122,8 +130,8 @@ export function renderHeader({ store = authStore, onLogin, onLogout, onNavigate 
         themeToggle.setAttribute("title", dark ? "Switch to light theme" : "Switch to dark theme")
         themeToggle.setAttribute("aria-pressed", String(dark))
         themeIcon.textContent = dark ? "☀" : "☾"
-        setSafeText(themeToggle, "")
-        themeToggle.append(themeIcon, document.createTextNode(dark ? " Light" : " Dark"))
+        themeLabel.textContent = dark ? "Light" : "Dark"
+        themeToggle.replaceChildren(themeIcon, themeLabel)
     }
 
     function update(state = store.getState()) {
@@ -132,7 +140,8 @@ export function renderHeader({ store = authStore, onLogin, onLogout, onNavigate 
         registerLink.hidden = authenticated
         action.dataset.authenticated = String(authenticated)
         setSafeText(accountLabel, authenticated ? getUserLabel(state.user) : "")
-        setSafeText(action, authenticated ? "Log out" : "Log in")
+        actionLabel.textContent = authenticated ? "Log out" : "Log in"
+        action.replaceChildren(actionLabel)
     }
 
     nav.append(homeLink, account)
