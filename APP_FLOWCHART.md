@@ -329,3 +329,49 @@ flowchart TD
 ```
 
 This flow follows the post-card action handlers through confirmation or editing state, the post service, and reactive UI updates. Deletion removes the existing card and updates the profile counter; editing updates the current card from the returned post data.
+
+### 4.3 Comments & Session Lifecycle Execution Flow
+
+```mermaid
+flowchart TD
+    subgraph PartA["Part A: Comment Creation Sequence"]
+        NavigateDetail["User navigates to #/posts/:id"] --> RenderDetail["renderPostDetailView(container, { postId })"]
+        RenderDetail --> Authenticated["Authenticated user sees comment form"]
+        Authenticated --> TypeComment["User types comment text"]
+        TypeComment --> SubmitComment["User clicks Comment submit button"]
+        SubmitComment --> HandleSubmit["Inline handleCommentSubmit(event) form submit listener"]
+        HandleSubmit --> PreventDefault["event.preventDefault() and input.value.trim()"]
+        PreventDefault --> ValidBody{"Comment body is non-empty?"}
+        ValidBody -->|"No"| ValidationError["Display required-comment error"]
+        ValidBody -->|"Yes"| CreateComment["commentsService.createComment(postId, body)"]
+        CreateComment --> PostRequest["http-client.js: post('/posts/' + postId + '/comments', body)"]
+        PostRequest --> Created{"API returns 201 Created?"}
+        Created -->|"No"| CommentError["Show toast and inline error, then re-enable submit"]
+        Created -->|"Yes"| NewComment["Receive new comment object"]
+        NewComment --> AppendComment["commentsList.prepend(renderCommentItem(createdComment))"]
+        AppendComment --> UpdateComments["Add new comment to post.comments"]
+        UpdateComments --> IncrementCount["Increment post.commentsCount and update counter text"]
+        IncrementCount --> ResetForm["Clear textarea and re-enable submit without page refresh"]
+    end
+
+    subgraph PartB["Part B: Session Lifecycle and Auto-Logout Flow"]
+        LogoutStart["User initiates logout from Header"] --> HeaderLogout["Header invokes onLogout callback"]
+        HeaderLogout --> ServiceLogout["authService.logout()"]
+        ServiceLogout --> ClearSession["authStore.clear() acts as logout"]
+        ClearSession --> ClearState["Set JWT token and user object to null"]
+        ClearState --> ClearStorage["Remove tarmeez.auth from LocalStorage"]
+        ClearStorage --> NotifySubscribers["Notify authStore subscribers"]
+        NotifySubscribers --> HeaderGuest["Header UI updates to Guest state"]
+        NotifySubscribers --> RerenderRoute["app.js subscription calls router.render()"]
+        RerenderRoute --> ProtectedCheck{"Current route requires authentication?"}
+        ProtectedCheck -->|"Yes"| LoginRedirect["router.navigate('#/login')"]
+        ProtectedCheck -->|"No"| PublicRoute["Re-render current public route as guest"]
+
+        AnyRequest["Any http-client.js request"] --> Response401{"Response status is 401 Unauthorized?"}
+        Response401 -->|"No"| NormalResponse["Return standard API success or error result"]
+        Response401 -->|"Yes"| AutoClear["http-client.js calls authStore.clear()"]
+        AutoClear --> ClearState
+    end
+```
+
+Comment creation keeps the detail view mounted: its submit listener validates the body, creates the comment through the service and HTTP client, then prepends the returned element and updates the in-memory count. Session clearing is shared by explicit logout and unauthorized API responses; store subscribers refresh the header and rerun route protection, which redirects protected views to `#/login`.
