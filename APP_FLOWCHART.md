@@ -143,7 +143,7 @@ flowchart TD
     AuthResult -->|"Yes"| StoreToken["Save JWT token to LocalStorage and update authStore"]
     StoreToken --> NotifySubscribers["authStore notifies header and app.js subscribers"]
     NotifySubscribers --> HeaderUpdate["Header UI updates to authenticated state"]
-    NotifySubscribers --> Redirect["navigate(\"#/\") redirects to Home or Profile"]
+    NotifySubscribers --> Redirect["navigate to #/ redirects to Home or Profile"]
 ```
 
 ### Post Detail View (`post-detail-view.js`)
@@ -172,4 +172,69 @@ flowchart TD
     CommentResult -->|"Yes"| PrependComment["Prepend new comment to comments list without page reload"]
     PrependComment --> UpdateCount["Update post.commentsCount and comments counter text"]
     UpdateCount --> ClearForm["Clear textarea and re-enable submit button"]
+```
+
+## Level 3: Core Modules & Services Flowcharts
+
+### Router Service (`router.js`)
+
+```mermaid
+flowchart TD
+    BrowserEvent["Browser hashchange or load event"] --> RenderLocation["renderLocation reads current hash path"]
+    RenderLocation --> ExtractPath["getHashPath extracts path and removes query string"]
+    ExtractPath --> MatchRoute["matchRoute compares path with configured routes"]
+    MatchRoute --> CompilePattern["compileRoute converts static and parameter segments into regex"]
+    CompilePattern --> RouteFound{"Route pattern matched?"}
+    RouteFound -->|"Yes"| ExtractParams["Decode dynamic values into params object"]
+    RouteFound -->|"No"| Fallback["Match configured /404 fallback route"]
+    ExtractParams --> RenderCallback["Call application render callback with route and root"]
+    Fallback --> RenderCallback
+    RenderCallback --> GuardCheck{"Protected route and unauthenticated?"}
+    GuardCheck -->|"Yes"| LoginRedirect["navigate to #/login"]
+    LoginRedirect --> RenderLocation
+    GuardCheck -->|"No"| RenderView["Render selected view"]
+```
+
+The router listens for hash changes and initial page load. It matches both static paths and parameterized paths such as `/users/:userId`; `app.js` performs the protected-route guard in its render callback before rendering a view.
+
+### HTTP Client Service (`http-client.js`)
+
+```mermaid
+flowchart TD
+    Request["Service calls request, get, post, put, or delete"] --> BuildUrl["Join API base URL with request path"]
+    BuildUrl --> BuildHeaders["Set Accept header and merge request headers"]
+    BuildHeaders --> TokenCheck{"Authentication token present?"}
+    TokenCheck -->|"Yes"| AttachToken["Attach Authorization Bearer token header"]
+    TokenCheck -->|"No"| PrepareBody["Prepare request body"]
+    AttachToken --> PrepareBody
+    PrepareBody --> FetchRequest["Call fetch wrapper"]
+    FetchRequest --> Response["Receive HTTP response"]
+    Response --> ParseJson["Parse JSON, text, or empty response"]
+    ParseJson --> Unauthorized{"Response status is 401?"}
+    Unauthorized -->|"Yes"| PurgeToken["Clear auth store session"]
+    Unauthorized -->|"No"| StatusCheck{"Response status successful?"}
+    PurgeToken --> StatusCheck
+    StatusCheck -->|"Yes"| Success["Return standard successful API result"]
+    StatusCheck -->|"No"| ApiError["Format and return standard API error"]
+    FetchRequest --> NetworkError["Return standard network error on fetch failure"]
+```
+
+### Auth Store (`auth-store.js`)
+
+```mermaid
+flowchart TD
+    Initialize["Create auth store"] --> LoadStorage["Read persisted session from LocalStorage"]
+    LoadStorage --> InitialState["Initialize token and user state"]
+    InitialState --> ListenerSet["Create listeners subscription set"]
+
+    Login["Login or registration succeeds"] --> SetToken["setToken or setSession stores token"]
+    SetToken --> SetUser["setUser or setSession stores user"]
+    SetUser --> Persist["Persist session in LocalStorage"]
+    Logout["Logout or HTTP unauthorized response"] --> Clear["clear removes token and user"]
+    Clear --> RemoveStorage["Remove persisted session from LocalStorage"]
+    Persist --> Notify["Notify every subscribed listener with current state"]
+    RemoveStorage --> Notify
+    ListenerSet --> Subscribe["Header and application views subscribe"]
+    Notify --> HeaderUpdate["Update Header UI authentication controls"]
+    Notify --> ViewUpdate["Re-render active route and update views"]
 ```
