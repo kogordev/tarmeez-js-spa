@@ -1,9 +1,12 @@
 import { renderErrorState } from "/js/components/error-state.js"
 import { renderLoadingState } from "/js/components/loading-state.js"
 import { renderPostList } from "/js/components/post-list.js"
+import { renderPostCard } from "/js/components/post-card.js"
+import { renderCreatePostCard } from "/js/components/create-post-card.js"
 import { renderCreatePostModal } from "/js/components/create-post-modal.js"
 import postsService from "/js/services/posts-service.js"
 import usersService from "/js/services/users-service.js"
+import authStore from "/js/store/auth-store.js"
 
 function messageFor(response) { return response?.error?.message || "Unable to load this profile." }
 
@@ -33,11 +36,27 @@ export function renderUserProfileView(container, { userId, navigate, userService
     let postsCount = 0
     let details = null
     let postsContainer = null
+    const isOwnProfile = authStore.isAuthenticated() && String(authStore.getUser()?.id) === String(userId)
+    let createPostCard = null
+    let isEditing = false
     const editModal = renderCreatePostModal({
         postService,
         service: postService,
-        onSuccess: () => load()
+        onSuccess: (post) => {
+            if (!isEditing && post) {
+                handleCreate(post)
+                return
+            }
+            load()
+        }
     })
+    function openEditModal(post) {
+        isEditing = Boolean(post)
+        editModal.open(post)
+    }
+    if (isOwnProfile) {
+        createPostCard = renderCreatePostCard({ onOpen: () => openEditModal() })
+    }
 
     function updateCounter() {
         if (details) {
@@ -50,6 +69,29 @@ export function renderUserProfileView(container, { userId, navigate, userService
         updateCounter()
         if (postsCount === 0 && postsContainer) {
             postsContainer.replaceChildren(renderEmptyPostsState())
+        }
+    }
+
+    function handleCreate(post) {
+        postsCount += 1
+        updateCounter()
+        const card = renderPostCard(post, {
+            onSelect: (item) => navigate(`#/posts/${item.id}`),
+            onEdit: (item) => openEditModal(item),
+            onDelete: () => handleDelete()
+        })
+        if (!postsContainer) return
+        const isEmptyContainer = postsContainer.classList.contains("user-posts__empty")
+        const hasEmptyChild = postsContainer.querySelector(".user-posts__empty")
+        if (isEmptyContainer) {
+            const list = renderPostList([])
+            list.append(card)
+            postsContainer.replaceWith(list)
+            postsContainer = list
+        } else if (hasEmptyChild) {
+            postsContainer.replaceChildren(card)
+        } else {
+            postsContainer.prepend(card)
         }
     }
 
@@ -74,16 +116,15 @@ export function renderUserProfileView(container, { userId, navigate, userService
             postsContainer = sortedPosts.length
                 ? renderPostList(sortedPosts, {
                     onSelect: (post) => navigate(`#/posts/${post.id}`),
-                    onEdit: (post) => editModal.open(post),
+                    onEdit: (post) => openEditModal(post),
                     onDelete: () => handleDelete()
                 })
                 : renderEmptyPostsState()
-            container.replaceChildren(
-                heading,
-                details,
-                postsContainer,
-                editModal
-            )
+            const content = document.createDocumentFragment()
+            content.append(heading, details)
+            if (createPostCard) content.append(createPostCard)
+            content.append(postsContainer, editModal)
+            container.replaceChildren(content)
         })
     }
     load()
