@@ -238,3 +238,55 @@ flowchart TD
     Notify --> HeaderUpdate["Update Header UI authentication controls"]
     Notify --> ViewUpdate["Re-render active route and update views"]
 ```
+
+## Level 4: Code-Level Function Call & Execution Sequence
+
+### 4.1 User Roles, Permissions & Post Creation Function Execution Flow
+
+```mermaid
+flowchart TD
+    subgraph PartA["Part A: User Roles and Permission Checks"]
+        GuestStart["Guest User"] --> GuestFeed["View public post feed"]
+        GuestStart --> GuestDetail["View post details"]
+        GuestStart --> GuestProfile["View public user profiles"]
+        GuestStart --> GuestBlocked["Attempt create/edit/delete post or comment"]
+        GuestBlocked --> GuestRedirect["Redirect to login/register views"]
+        GuestRedirect --> LoginView["login-view.js"]
+        GuestRedirect --> RegisterView["register-view.js"]
+
+        LoginView --> LoginSubmit["Submit login form"]
+        RegisterView --> RegisterSubmit["Submit registration form"]
+        LoginSubmit --> AuthService["auth-service.js"]
+        RegisterSubmit --> AuthService
+        AuthService --> AuthSuccess["Successful auth response"]
+        AuthSuccess --> SaveToken["auth-store.js: save JWT token and user session"]
+        SaveToken --> AuthUser["Authenticated User"]
+
+        AuthUser --> CreatePostAccess["Create new posts"]
+        AuthUser --> CommentAccess["Comment on posts"]
+        AuthUser --> EditOwn["Edit own posts"]
+        AuthUser --> DeleteOwn["Delete own posts"]
+        AuthUser --> FullAccess["Full privileges unlocked"]
+    end
+
+    subgraph PartB["Part B: Post Creation Execution Sequence"]
+        StartCreate["Authenticated user starts post creation"] --> AuthCheck{"authStore.isAuthenticated() returns true?"}
+        AuthCheck -->|"Yes"| TriggerClick["User clicks create-post trigger card"]
+        AuthCheck -->|"No"| BlockedCreate["Block action and redirect to login"]
+
+        TriggerClick --> OpenModal["openCreatePostModal()"]
+        OpenModal --> SubmitHandler["Form submit listener fires: handlePostSubmit(event)"]
+        SubmitHandler --> PayloadBuild["Construct request payload from form input"]
+        PayloadBuild --> ApiCall["http-client.js: post('/posts', body)"]
+        ApiCall --> ResponseCheck{"Response status is 201 Created?"}
+        ResponseCheck -->|"Yes"| OnSuccess["onSuccess(newPost)"]
+        ResponseCheck -->|"No"| ErrorState["Display API or validation error"]
+
+        OnSuccess --> RenderCard["renderPostCard(newPost)"]
+        RenderCard --> PrependDom["feedContainer.prepend(postElement)"]
+        PrependDom --> UpdateState["incrementPostCounter() and hide .user-posts__empty if visible"]
+        UpdateState --> SuccessEnd["New post appears at top of feed"]
+    end
+```
+
+This Level 4 adds the code-level permission model and the exact function chain for creating a post. Guests can browse publicly, while any write attempt is intercepted and redirected to authentication. Once authenticated, the post flow progresses through modal open, submit handler, HTTP request, success callback, DOM insertion, and state updates that make the new post immediately visible in the current feed.
