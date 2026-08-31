@@ -242,12 +242,10 @@
 }
 
 .post-list { display: grid; gap: 1.5rem; }
-.create-post-card { margin-bottom: 1.5rem; padding: var(--space-3) var(--space-4); border: 1px solid var(--color-line); border-radius: 12px; background: var(--color-surface); box-shadow: 0 8px 24px var(--color-shadow); }
+.create-post-card { margin-bottom: 1.5rem; padding: var(--space-4); border: 1px solid var(--color-line); border-radius: 12px; background: var(--color-surface); box-shadow: 0 8px 24px var(--color-shadow); }
 .create-post-card__trigger { display: flex; width: 100%; align-items: center; gap: var(--space-3); border: 0; padding: 0; color: var(--color-muted); background: transparent; }
 .create-post-card__trigger:hover { color: var(--color-ink); }
 .create-post-card__avatar { width: 40px; height: 40px; flex: 0 0 40px; border-radius: 50%; object-fit: cover; background: var(--color-avatar); }
-.create-post-card__actions { display: flex; margin-top: var(--space-3); padding-top: var(--space-3); border-top: 1px solid var(--color-line); }
-.create-post-card__action { color: var(--color-accent-dark); font-size: 0.9rem; font-weight: 700; }
 .create-post-modal { position: fixed; inset: 0; z-index: 20; display: grid; place-items: center; padding: var(--space-3); background: var(--color-overlay); }
 .create-post-modal[hidden] { display: none; }
 .create-post-modal__panel { position: relative; width: min(100%, 560px); padding: var(--space-5); border: 1px solid var(--color-line); border-radius: 12px; background: var(--color-surface); box-shadow: 0 20px 60px var(--color-shadow-strong); }

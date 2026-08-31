@@ -12,8 +12,6 @@ export function renderCreatePostCard({ store = authStore, onOpen } = {}) {
     const trigger = document.createElement("button")
     const avatar = document.createElement("img")
     const prompt = document.createElement("span")
-    const actions = document.createElement("div")
-    const action = document.createElement("span")
 
     card.className = "create-post-card"
     trigger.type = "button"
@@ -23,9 +21,6 @@ export function renderCreatePostCard({ store = authStore, onOpen } = {}) {
     avatar.src = getImageUrl(user.profileImageUrl, DEFAULT_AVATAR_FALLBACK)
     avatar.addEventListener("error", (event) => setImageFallback(event, "avatar"))
     prompt.textContent = `What's on your mind, ${getUserLabel(user)}?`
-    action.className = "create-post-card__action"
-    action.textContent = "Image"
-    actions.className = "create-post-card__actions"
 
     const open = () => onOpen?.()
     trigger.append(avatar, prompt)
@@ -33,8 +28,7 @@ export function renderCreatePostCard({ store = authStore, onOpen } = {}) {
     card.addEventListener("click", (event) => {
         if (!event.target.closest("button")) open()
     })
-    actions.append(action)
-    card.append(trigger, actions)
+    card.append(trigger)
     return card
 }
 
