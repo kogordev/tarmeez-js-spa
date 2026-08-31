@@ -290,6 +290,11 @@
 .error-state p { margin-top: 0; }
 .error-state__retry { margin-top: var(--space-2); }
 
+.user-posts__empty { display: flex; flex-direction: column; align-items: center; gap: var(--space-2); padding: var(--space-5); border: 1px dashed var(--color-line); border-radius: 12px; background: var(--color-surface); text-align: center; color: var(--color-muted); }
+.user-posts__empty svg { color: var(--color-muted); }
+.user-posts__empty h3 { margin: 0; color: var(--color-ink); }
+.user-posts__empty p { margin: 0; }
+
 .auth-form, .comment-form { display: grid; gap: var(--space-3); max-width: 440px; margin: 4rem auto; padding: var(--space-5); border: 1px solid var(--color-line); border-radius: 12px; background: var(--color-surface); box-shadow: 0 8px 24px var(--color-shadow); }
 .auth-form button { width: 100%; }
 .auth-form input, .comment-form textarea { width: 100%; border: 1px solid var(--color-line); border-radius: 8px; padding: 0.8rem 0.9rem; color: var(--color-ink); background: var(--color-input); transition: border-color 160ms ease, box-shadow 160ms ease; }
