@@ -290,3 +290,42 @@ flowchart TD
 ```
 
 This Level 4 adds the code-level permission model and the exact function chain for creating a post. Guests can browse publicly, while any write attempt is intercepted and redirected to authentication. Once authenticated, the post flow progresses through modal open, submit handler, HTTP request, success callback, DOM insertion, and state updates that make the new post immediately visible in the current feed.
+
+### 4.2 Post Edit & Deletion Execution Flow
+
+```mermaid
+flowchart TD
+    subgraph PartA["Part A: Post Deletion Sequence"]
+        DeleteClick["User clicks delete icon in post-card.js"] --> OwnershipCheck{"post.author.id === currentUser.id?"}
+        OwnershipCheck -->|"No"| DenyDelete["Do not expose or execute delete action"]
+        OwnershipCheck -->|"Yes"| OpenConfirm["renderConfirmModal() opens delete confirmation"]
+        OpenConfirm --> ConfirmDelete["User confirms delete action"]
+        ConfirmDelete --> DeletePost["postsService.deletePost(postId)"]
+        DeletePost --> DeleteRequest["http-client.js: delete('/posts/' + postId)"]
+        DeleteRequest --> DeleteResult{"API returns 200 OK?"}
+        DeleteResult -->|"No"| DeleteError["Show deletion error in confirmation modal"]
+        DeleteResult -->|"Yes"| RemoveCard["postElement.remove() removes the card without page reload"]
+        RemoveCard --> DeleteCallback["onDelete(post) updates profile state"]
+        DeleteCallback --> DecrementCount["Decrement counter: @username | X posts"]
+        DecrementCount --> EmptyCheck{"Remaining profile post elements === 0?"}
+        EmptyCheck -->|"Yes"| InjectEmpty["Inject .user-posts__empty"]
+        EmptyCheck -->|"No"| KeepPosts["Keep remaining profile post elements"]
+    end
+
+    subgraph PartB["Part B: Post Editing Sequence"]
+        EditClick["User clicks edit icon in post-card.js"] --> EditOwnership{"post.author.id === currentUser.id?"}
+        EditOwnership -->|"No"| DenyEdit["Do not expose or execute edit action"]
+        EditOwnership -->|"Yes"| EmitEdit["onEdit(post) opens the edit modal"]
+        EmitEdit --> PrefillModal["createPostModal.open(post) sets editingPost and pre-fills text and image data"]
+        PrefillModal --> EditingMode["isEditing is true while editingPost is present"]
+        EditingMode --> EditSubmit["Form submit triggers handlePostEdit(event)"]
+        EditSubmit --> UpdatePost["postsService.updatePost(postId, updatedBody)"]
+        UpdatePost --> PutRequest["http-client.js: put('/posts/' + postId, updatedBody)"]
+        PutRequest --> EditResult{"API returns updated post object?"}
+        EditResult -->|"No"| EditError["Show validation or API error in modal"]
+        EditResult -->|"Yes"| EditSuccess["onSuccess(updatedPost) receives updated post data"]
+        EditSuccess --> UpdateCard["Update title, body, and image in the existing post card without re-rendering the feed list"]
+    end
+```
+
+This flow follows the post-card action handlers through confirmation or editing state, the post service, and reactive UI updates. Deletion removes the existing card and updates the profile counter; editing updates the current card from the returned post data.
