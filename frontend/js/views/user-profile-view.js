@@ -7,8 +7,52 @@ import { renderCreatePostModal } from "/js/components/create-post-modal.js"
 import postsService from "/js/services/posts-service.js"
 import usersService from "/js/services/users-service.js"
 import authStore from "/js/store/auth-store.js"
+import { DEFAULT_AVATAR_FALLBACK, getImageUrl, setImageFallback } from "/js/utils/images.js"
 
 function messageFor(response) { return response?.error?.message || "Unable to load this profile." }
+
+export function renderProfileHeader(user = {}, { onEdit } = {}) {
+    const card = document.createElement("section")
+    card.className = "profile-card"
+
+    const avatar = document.createElement("img")
+    avatar.className = "profile-card__avatar"
+    avatar.src = getImageUrl(user.profileImageUrl, DEFAULT_AVATAR_FALLBACK)
+    avatar.alt = user.name || user.username || "User avatar"
+    avatar.addEventListener("error", (event) => setImageFallback(event, "avatar"))
+
+    const info = document.createElement("div")
+    info.className = "profile-card__info"
+
+    const name = document.createElement("h1")
+    name.className = "profile-card__name"
+    name.textContent = user.name || user.username || "User profile"
+
+    const handle = document.createElement("p")
+    handle.className = "profile-card__handle"
+    handle.textContent = `@${user.username || ""}`
+
+    const stats = document.createElement("div")
+    stats.className = "profile-card__stats"
+    stats.innerHTML = `
+        <span class="profile-card__stat">${user.postsCount || 0} posts</span>
+        <span class="profile-card__stat">${user.commentsCount || 0} comments</span>
+    `
+
+    info.append(name, handle, stats)
+
+    if (onEdit) {
+        const editButton = document.createElement("button")
+        editButton.type = "button"
+        editButton.className = "profile-card__edit-button"
+        editButton.textContent = "Edit Profile"
+        editButton.addEventListener("click", () => onEdit())
+        info.append(editButton)
+    }
+
+    card.append(avatar, info)
+    return card
+}
 
 function sortByNewest(posts) {
     return [...posts].sort((a, b) => (Number(b.id) || 0) - (Number(a.id) || 0))
@@ -32,9 +76,8 @@ function renderEmptyPostsState() {
 
 export function renderUserProfileView(container, { userId, navigate, userService = usersService, postService = postsService } = {}) {
     let active = true
-    let username = ""
     let postsCount = 0
-    let details = null
+    let profileHeader = null
     let postsContainer = null
     const isOwnProfile = authStore.isAuthenticated() && String(authStore.getUser()?.id) === String(userId)
     let createPostCard = null
@@ -59,8 +102,9 @@ export function renderUserProfileView(container, { userId, navigate, userService
     }
 
     function updateCounter() {
-        if (details) {
-            details.textContent = `@${username} | ${postsCount} posts`
+        const stat = profileHeader?.querySelector(".profile-card__stat")
+        if (stat) {
+            stat.textContent = `${postsCount} posts`
         }
     }
 
@@ -106,12 +150,8 @@ export function renderUserProfileView(container, { userId, navigate, userService
                 return
             }
             const user = userResponse.data
-            username = user.username
             postsCount = user.postsCount ?? postsResponse.data.items.length
-            const heading = document.createElement("h1")
-            heading.textContent = user.name || user.username || "User profile"
-            details = document.createElement("p")
-            updateCounter()
+            profileHeader = renderProfileHeader(user, { onEdit: isOwnProfile ? () => {} : undefined })
             const sortedPosts = sortByNewest(postsResponse.data.items)
             postsContainer = sortedPosts.length
                 ? renderPostList(sortedPosts, {
@@ -121,7 +161,7 @@ export function renderUserProfileView(container, { userId, navigate, userService
                 })
                 : renderEmptyPostsState()
             const content = document.createDocumentFragment()
-            content.append(heading, details)
+            content.append(profileHeader)
             if (createPostCard) content.append(createPostCard)
             content.append(postsContainer, editModal)
             container.replaceChildren(content)
