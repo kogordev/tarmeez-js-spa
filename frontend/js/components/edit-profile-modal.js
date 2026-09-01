@@ -11,7 +11,6 @@ export function renderEditProfileModal({ service = authService, store = authStor
     const close = document.createElement("button")
     const form = document.createElement("form")
     const heading = document.createElement("h2")
-    const name = document.createElement("input")
     const username = document.createElement("input")
     const password = document.createElement("input")
     const error = document.createElement("p")
@@ -30,11 +29,6 @@ export function renderEditProfileModal({ service = authService, store = authStor
     close.textContent = "X"
     heading.id = "edit-profile-modal-title"
     heading.textContent = "Edit profile"
-
-    name.name = "name"
-    name.placeholder = "Name"
-    name.required = true
-    name.setAttribute("dir", "auto")
 
     username.name = "username"
     username.placeholder = "Username"
@@ -75,10 +69,9 @@ export function renderEditProfileModal({ service = authService, store = authStor
         modal.hidden = false
         modal.setAttribute("aria-hidden", "false")
         resetSubmitState()
-        name.value = user?.name || ""
         username.value = user?.username || ""
         password.value = ""
-        name.focus()
+        username.focus()
     }
 
     close.addEventListener("click", closeModal)
@@ -91,19 +84,15 @@ export function renderEditProfileModal({ service = authService, store = authStor
         error.hidden = true
 
         const currentUser = store.getUser() || {}
-        const nextName = name.value.trim()
-        const nextUsername = username.value.trim()
-        const nextPassword = password.value.trim()
+        const usernameVal = username.value.trim()
+        const passwordVal = password.value.trim()
 
         const input = {}
-        if (nextName !== (currentUser.name || "")) {
-            input.name = nextName
+        if (usernameVal && usernameVal !== currentUser.username) {
+            input.username = usernameVal
         }
-        if (nextUsername !== (currentUser.username || "")) {
-            input.username = nextUsername
-        }
-        if (nextPassword) {
-            input.password = nextPassword
+        if (passwordVal) {
+            input.password = passwordVal
         }
 
         if (Object.keys(input).length === 0) {
@@ -125,7 +114,7 @@ export function renderEditProfileModal({ service = authService, store = authStor
         }
     })
 
-    form.append(name, username, password, error, submit)
+    form.append(username, password, error, submit)
     panel.append(close, heading, form)
     modal.append(panel)
     modal.open = openModal
