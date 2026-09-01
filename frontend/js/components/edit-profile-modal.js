@@ -1,4 +1,11 @@
-export function renderEditProfileModal() {
+import defaultAuthService from "/js/services/auth-service.js"
+import authStore from "/js/store/auth-store.js"
+
+function messageFor(response) {
+    return response?.error?.message || "Unable to update your profile."
+}
+
+export function renderEditProfileModal({ authService = defaultAuthService } = {}) {
     const modal = document.createElement("div")
     const panel = document.createElement("section")
     const header = document.createElement("div")
@@ -14,9 +21,13 @@ export function renderEditProfileModal() {
     const passwordGroup = document.createElement("div")
     const passwordLabel = document.createElement("label")
     const passwordInput = document.createElement("input")
+    const error = document.createElement("p")
     const actions = document.createElement("div")
     const cancel = document.createElement("button")
     const submit = document.createElement("button")
+    let activeUser = null
+    let onUpdated = null
+
 
     modal.className = "modal-overlay edit-profile-modal"
     modal.hidden = true
@@ -54,6 +65,8 @@ export function renderEditProfileModal() {
     passwordInput.name = "password"
     passwordInput.type = "password"
     passwordInput.placeholder = "New password (optional)"
+    error.className = "form-error"
+    error.hidden = true
     actions.className = "modal-actions"
     cancel.type = "button"
     cancel.className = "btn btn-secondary edit-profile-modal__cancel"
@@ -62,16 +75,31 @@ export function renderEditProfileModal() {
     submit.className = "btn btn-primary edit-profile-modal__submit"
     submit.textContent = "Save changes"
 
+    function resetSubmitState(clearError = true) {
+        submit.disabled = false
+        submit.textContent = "Save changes"
+        if (clearError) {
+            error.hidden = true
+            error.textContent = ""
+        }
+    }
+
     function closeModal() {
         modal.hidden = true
         modal.setAttribute("aria-hidden", "true")
         form.reset()
+        resetSubmitState()
+        activeUser = null
+        onUpdated = null
     }
 
-    function openModal(user = {}) {
+    function openModal(user = {}, onUpdatedCallback) {
+        activeUser = user
+        onUpdated = onUpdatedCallback || null
         nameInput.value = user.name || ""
         usernameInput.value = user.username || ""
         passwordInput.value = ""
+        resetSubmitState()
         modal.hidden = false
         modal.setAttribute("aria-hidden", "false")
         nameInput.focus()
@@ -82,8 +110,40 @@ export function renderEditProfileModal() {
     modal.addEventListener("click", (event) => {
         if (event.target === modal) closeModal()
     })
-    form.addEventListener("submit", (event) => {
+    form.addEventListener("submit", async (event) => {
         event.preventDefault()
+        const user = activeUser || {}
+        const payload = {}
+        if (nameInput.value.trim() !== (user.name || "")) {
+            payload.name = nameInput.value.trim()
+        }
+        if (usernameInput.value.trim() !== (user.username || "")) {
+            payload.username = usernameInput.value.trim()
+        }
+        if (passwordInput.value.trim() !== "") {
+            payload.password = passwordInput.value.trim()
+        }
+
+        if (Object.keys(payload).length === 0) {
+            closeModal()
+            return
+        }
+
+        submit.disabled = true
+        submit.textContent = "Saving..."
+        error.hidden = true
+
+        const response = await authService.updateProfile(payload)
+        if (response.ok) {
+            const updatedUser = authStore.getUser() || { ...user, ...payload }
+            const callback = onUpdated
+            closeModal()
+            callback?.(updatedUser)
+        } else {
+            resetSubmitState(false)
+            error.textContent = messageFor(response)
+            error.hidden = false
+        }
     })
 
     header.append(heading, close)
@@ -91,7 +151,7 @@ export function renderEditProfileModal() {
     nameGroup.append(nameLabel, nameInput)
     usernameGroup.append(usernameLabel, usernameInput)
     passwordGroup.append(passwordLabel, passwordInput)
-    form.append(nameGroup, usernameGroup, passwordGroup, actions)
+    form.append(nameGroup, usernameGroup, passwordGroup, error, actions)
     panel.append(header, form)
     modal.append(panel)
     modal.open = openModal

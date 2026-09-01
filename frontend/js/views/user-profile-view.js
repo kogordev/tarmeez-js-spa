@@ -119,6 +119,14 @@ export function renderUserProfileView(container, { userId, navigate, userService
         }
     }
 
+    function syncProfileHeader(user) {
+        if (!profileHeader || !user) return
+        const name = profileHeader.querySelector(".profile-card__name")
+        const handle = profileHeader.querySelector(".profile-card__handle")
+        if (name) name.textContent = user.name || user.username || "User profile"
+        if (handle) handle.textContent = `@${user.username || ""}`
+    }
+
     function handleDelete() {
         postsCount = Math.max(0, postsCount - 1)
         updateCounter()
@@ -162,7 +170,7 @@ export function renderUserProfileView(container, { userId, navigate, userService
             }
             const user = userResponse.data
             postsCount = user.postsCount ?? postsResponse.data.items.length
-            profileHeader = renderProfileHeader(user, { onEdit: isOwnProfile ? () => editProfileModal.open(user) : undefined })
+            profileHeader = renderProfileHeader(user, { onEdit: isOwnProfile ? () => editProfileModal.open(user, syncProfileHeader) : undefined })
             const sortedPosts = sortByNewest(postsResponse.data.items)
             postsContainer = sortedPosts.length
                 ? renderPostList(sortedPosts, {

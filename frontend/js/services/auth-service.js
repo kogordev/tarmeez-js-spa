@@ -44,5 +44,23 @@ export async function logout() {
     return response
 }
 
-export const authService = { register, login, logout }
+export async function updateProfile(payload = {}) {
+    const formData = new FormData()
+    formData.append("_method", "PUT")
+    appendFormValue(formData, "name", payload.name)
+    appendFormValue(formData, "username", payload.username)
+    appendFormValue(formData, "password", payload.password)
+
+    const response = await httpClient.post("/updatePorfile", formData)
+    if (response.ok) {
+        const raw = response.data?.data && typeof response.data.data === "object" ? response.data.data : response.data
+        const user = normalizeUser(raw?.user || raw)
+        if (user) {
+            authStore.setUser(user)
+        }
+    }
+    return response
+}
+
+export const authService = { register, login, logout, updateProfile }
 export default authService
