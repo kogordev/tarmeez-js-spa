@@ -32,27 +32,36 @@ export function renderProfileHeader(user = {}, { onEdit } = {}) {
     name.className = "profile-card__name"
     name.textContent = user.name || user.username || "User profile"
 
-    const handle = document.createElement("p")
-    handle.className = "profile-card__handle"
+    const meta = document.createElement("div")
+    meta.className = "profile-card__meta d-inline-flex align-items-center gap-2"
+
+    const handle = document.createElement("span")
+    handle.className = "profile-card__handle text-muted"
     handle.textContent = `@${user.username || ""}`
 
-    const email = document.createElement("div")
-    email.className = "profile-email text-muted small mt-1"
+    const separator = document.createElement("span")
+    separator.className = "text-muted opacity-50"
+    separator.textContent = "•"
+
+    const email = document.createElement("span")
+    email.className = "profile-email text-muted d-inline-flex align-items-center gap-1"
     const emailIcon = document.createElement("i")
-    emailIcon.className = "bi bi-envelope me-1"
+    emailIcon.className = "bi bi-envelope opacity-75"
     const emailText = document.createElement("span")
     emailText.id = "profile-email-text"
     emailText.textContent = user.email || "No email provided"
     email.append(emailIcon, emailText)
 
+    meta.append(handle, separator, email)
+
     const stats = document.createElement("div")
-    stats.className = "profile-card__stats"
+    stats.className = "profile-card__stats mt-2"
     stats.innerHTML = `
         <span class="profile-card__stat">${user.postsCount || 0} posts</span>
         <span class="profile-card__stat">${user.commentsCount || 0} comments</span>
     `
 
-    info.append(name, handle, email, stats)
+    info.append(name, meta, stats)
     user_.append(avatar, info)
     card.append(user_)
 
