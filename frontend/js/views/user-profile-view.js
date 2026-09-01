@@ -36,6 +36,15 @@ export function renderProfileHeader(user = {}, { onEdit } = {}) {
     handle.className = "profile-card__handle"
     handle.textContent = `@${user.username || ""}`
 
+    const email = document.createElement("div")
+    email.className = "profile-email text-muted small mt-1"
+    const emailIcon = document.createElement("i")
+    emailIcon.className = "bi bi-envelope me-1"
+    const emailText = document.createElement("span")
+    emailText.id = "profile-email-text"
+    emailText.textContent = user.email || "No email provided"
+    email.append(emailIcon, emailText)
+
     const stats = document.createElement("div")
     stats.className = "profile-card__stats"
     stats.innerHTML = `
@@ -43,7 +52,7 @@ export function renderProfileHeader(user = {}, { onEdit } = {}) {
         <span class="profile-card__stat">${user.commentsCount || 0} comments</span>
     `
 
-    info.append(name, handle, stats)
+    info.append(name, handle, email, stats)
     user_.append(avatar, info)
     card.append(user_)
 
@@ -123,9 +132,11 @@ export function renderUserProfileView(container, { userId, navigate, userService
         if (!profileHeader || !user) return
         const name = profileHeader.querySelector(".profile-card__name")
         const handle = profileHeader.querySelector(".profile-card__handle")
+        const emailText = profileHeader.querySelector("#profile-email-text")
         const avatar = profileHeader.querySelector(".profile-card__avatar")
         if (name) name.textContent = user.name || user.username || "User profile"
         if (handle) handle.textContent = `@${user.username || ""}`
+        if (emailText) emailText.textContent = user.email || "No email provided"
         if (avatar && user.profileImageUrl) {
             delete avatar.dataset.fallbackApplied
             avatar.src = getImageUrl(user.profileImageUrl, DEFAULT_AVATAR_FALLBACK)
