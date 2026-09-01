@@ -122,6 +122,28 @@ The image modal is implemented as a reusable DOM overlay that supports:
 - automatic close on browser history navigation
 - smooth fade-in/fade-out transitions
 
+## Authentication, Registration, and Profile Management
+
+### Authentication and registration
+
+Registration sends a `POST /register` request. The registration form supports an optional profile picture: when a file is selected, it is appended to the request `FormData` as `image`; registrations without a picture omit that field.
+
+### Profile management and API constraints
+
+Profile edits use `POST /updatePorfile` with `_method: "PUT"` in `FormData`, matching the Tarmeez API's required method override and endpoint spelling. The update payload contains:
+
+- `name` (required)
+- `email` (optional, included only when it changed)
+- `_method: "PUT"`
+
+The edit-profile modal intentionally does not expose `password` or `image` fields. The current backend corrupts password hashing on profile updates and ignores multipart image payloads for this endpoint, so those controls would imply support the API cannot provide.
+
+The client handles the API's intermittent `500 Server Error` responses gracefully. Because the backend may persist a profile change before returning a 500 response, the client treats that response as a fallback success, merges the submitted name and email into `authStore`, and updates the UI without surfacing a breaking error.
+
+### UI and component architecture
+
+`user-profile-view.js` renders a clean, responsive profile header card with the user's avatar, name, handle, activity counts, and an edit action for the signed-in user's own profile. Its structured layout keeps identity and stats readable on mobile while keeping the edit control separate from profile information.
+
 ## Architecture & Diagrams
 
 The frontend architecture and interaction flow are documented in [ARCHITECTURE.md](ARCHITECTURE.md). It includes Mermaid diagrams for the application structure, user journey, navigation lifecycle, and state/data flow.
