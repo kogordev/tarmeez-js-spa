@@ -71,11 +71,12 @@ export function renderEditProfileModal({ service = authService, store = authStor
     }
 
     function openModal(user = null) {
+        const currentUser = user || store.getUser() || {}
         modal.hidden = false
         modal.setAttribute("aria-hidden", "false")
         resetSubmitState()
-        name.value = user?.name || user?.username || ""
-        username.value = user?.username || ""
+        name.value = currentUser.name || currentUser.username || ""
+        username.value = currentUser.username || ""
         password.value = ""
         name.focus()
     }
@@ -90,22 +91,22 @@ export function renderEditProfileModal({ service = authService, store = authStor
         error.hidden = true
 
         const currentUser = store.getUser() || {}
+        const payload = {}
         const nameVal = name.value.trim()
         const usernameVal = username.value.trim()
         const passwordVal = password.value.trim()
 
-        const input = {}
-        if (nameVal !== currentUser.name) {
-            input.name = nameVal
+        if (nameVal && nameVal !== currentUser.name) {
+            payload.name = nameVal
         }
-        if (usernameVal !== currentUser.username) {
-            input.username = usernameVal
+        if (usernameVal && usernameVal !== currentUser.username) {
+            payload.username = usernameVal
         }
-        if (passwordVal !== "") {
-            input.password = passwordVal
+        if (passwordVal) {
+            payload.password = passwordVal
         }
 
-        if (Object.keys(input).length === 0) {
+        if (Object.keys(payload).length === 0) {
             closeModal()
             return
         }
@@ -113,7 +114,7 @@ export function renderEditProfileModal({ service = authService, store = authStor
         submit.disabled = true
         submit.textContent = "Saving..."
 
-        const response = await service.updateProfile(input)
+        const response = await service.updateProfile(payload)
         if (response.ok) {
             closeModal()
             onSuccess?.(response.data)
