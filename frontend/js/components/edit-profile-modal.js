@@ -19,6 +19,9 @@ export function renderEditProfileModal({ authService = defaultAuthService } = {}
     const close = document.createElement("button")
     const heading = document.createElement("h3")
     const form = document.createElement("form")
+    const imageGroup = document.createElement("div")
+    const imageLabel = document.createElement("label")
+    const imageInput = document.createElement("input")
     const nameGroup = document.createElement("div")
     const nameLabel = document.createElement("label")
     const nameInput = document.createElement("input")
@@ -47,6 +50,14 @@ export function renderEditProfileModal({ authService = defaultAuthService } = {}
     close.textContent = "X"
     heading.id = "edit-profile-modal-title"
     heading.textContent = "Edit Profile"
+    imageGroup.className = "form-group"
+    imageLabel.htmlFor = "edit-profile-image"
+    imageLabel.textContent = "Profile Picture"
+    imageInput.id = "edit-profile-image"
+    imageInput.className = "form-control"
+    imageInput.name = "image"
+    imageInput.type = "file"
+    imageInput.accept = "image/*"
     nameGroup.className = "form-group"
     nameLabel.htmlFor = "edit-profile-name"
     nameLabel.textContent = "Display name"
@@ -95,6 +106,7 @@ export function renderEditProfileModal({ authService = defaultAuthService } = {}
         onUpdated = onUpdatedCallback || null
         nameInput.value = user.name || ""
         emailInput.value = user.email || ""
+        imageInput.value = ""
         resetSubmitState()
         modal.hidden = false
         modal.setAttribute("aria-hidden", "false")
@@ -112,8 +124,9 @@ export function renderEditProfileModal({ authService = defaultAuthService } = {}
         const nameValue = nameInput.value.trim()
         const emailValue = emailInput.value.trim()
         const emailChanged = emailValue !== (user.email || "")
+        const imageFile = imageInput.files[0]
 
-        if (nameValue === (user.name || "") && !emailChanged) {
+        if (nameValue === (user.name || "") && !emailChanged && !imageFile) {
             closeModal()
             return
         }
@@ -122,6 +135,9 @@ export function renderEditProfileModal({ authService = defaultAuthService } = {}
         formData.append("name", nameValue)
         if (emailChanged) {
             formData.append("email", emailValue)
+        }
+        if (imageFile) {
+            formData.append("image", imageFile)
         }
         formData.append("_method", "PUT")
 
@@ -144,9 +160,10 @@ export function renderEditProfileModal({ authService = defaultAuthService } = {}
 
     header.append(heading, close)
     actions.append(cancel, submit)
+    imageGroup.append(imageLabel, imageInput)
     nameGroup.append(nameLabel, nameInput)
     emailGroup.append(emailLabel, emailInput)
-    form.append(nameGroup, emailGroup, error, actions)
+    form.append(imageGroup, nameGroup, emailGroup, error, actions)
     panel.append(header, form)
     modal.append(panel)
     modal.open = openModal

@@ -123,8 +123,13 @@ export function renderUserProfileView(container, { userId, navigate, userService
         if (!profileHeader || !user) return
         const name = profileHeader.querySelector(".profile-card__name")
         const handle = profileHeader.querySelector(".profile-card__handle")
+        const avatar = profileHeader.querySelector(".profile-card__avatar")
         if (name) name.textContent = user.name || user.username || "User profile"
         if (handle) handle.textContent = `@${user.username || ""}`
+        if (avatar && user.profileImageUrl) {
+            delete avatar.dataset.fallbackApplied
+            avatar.src = getImageUrl(user.profileImageUrl, DEFAULT_AVATAR_FALLBACK)
+        }
     }
 
     function handleDelete() {
