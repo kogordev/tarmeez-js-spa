@@ -2,6 +2,13 @@ import defaultAuthService from "/js/services/auth-service.js"
 import authStore from "/js/store/auth-store.js"
 
 function messageFor(response) {
+    const errors = response?.error?.details?.errors
+    if (errors && typeof errors === "object") {
+        const firstKey = Object.keys(errors)[0]
+        const firstError = firstKey ? errors[firstKey] : null
+        const firstMessage = Array.isArray(firstError) ? firstError[0] : firstError
+        if (firstMessage) return firstMessage
+    }
     return response?.error?.message || "Unable to update your profile."
 }
 
@@ -117,7 +124,7 @@ export function renderEditProfileModal({ authService = defaultAuthService } = {}
         if (nameInput.value.trim() !== (user.name || "")) {
             payload.name = nameInput.value.trim()
         }
-        if (usernameInput.value.trim() !== (user.username || "")) {
+        if (usernameInput.value.trim() !== user.username) {
             payload.username = usernameInput.value.trim()
         }
         if (passwordInput.value.trim() !== "") {
