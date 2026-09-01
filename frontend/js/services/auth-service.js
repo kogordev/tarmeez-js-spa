@@ -21,8 +21,10 @@ function getAuthData(data) {
 }
 
 function extractUpdatedUser(data) {
-    const value = data?.data && typeof data.data === "object" ? data.data : data
-    return normalizeUser(value?.user || value)
+    // Response shape varies across endpoints: { data: { user } }, { data: user }, { user }, or the user object itself.
+    const outer = data?.data && typeof data.data === "object" ? data.data : data
+    const candidate = outer?.user && typeof outer.user === "object" ? outer.user : outer
+    return normalizeUser(candidate)
 }
 
 export async function register(input) {
@@ -52,11 +54,13 @@ export async function logout() {
 export async function updateProfile(input) {
     const response = await httpClient.put("/updatePorfile", input)
     if (response.ok) {
-        const updatedUser = extractUpdatedUser(response.data)
-        if (updatedUser) {
-            authStore.setUser({ ...authStore.getUser(), ...updatedUser })
-        }
-        return { ...response, data: { user: updatedUser } }
+        const previousUser = authStore.getUser() || {}
+        const parsedUser = extractUpdatedUser(response.data)
+        // Some backends echo only a success message with no user payload; fall back to
+        // merging the submitted fields so the UI still reflects what was just saved.
+        const updatedUser = parsedUser || { ...previousUser, ...input }
+        authStore.setUser({ ...previousUser, ...updatedUser })
+        return { ...response, data: { user: authStore.getUser() } }
     }
     return response
 }

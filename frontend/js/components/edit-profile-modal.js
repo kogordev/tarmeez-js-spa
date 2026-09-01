@@ -70,8 +70,9 @@ export function renderEditProfileModal({ service = authService, store = authStor
         onClose?.()
     }
 
-    function openModal(user = null) {
-        const currentUser = user || store.getUser() || {}
+    function openModal() {
+        // Always read the latest store state so a stale user object never gets pre-filled.
+        const currentUser = store.getUser() || {}
         modal.hidden = false
         modal.setAttribute("aria-hidden", "false")
         resetSubmitState()

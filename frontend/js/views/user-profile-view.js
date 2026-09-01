@@ -160,7 +160,7 @@ export function renderUserProfileView(container, { userId, navigate, userService
             const user = userResponse.data
             postsCount = user.postsCount ?? postsResponse.data.items.length
             const { header, badge: headerBadge, nameEl: headerNameEl, usernameEl: headerUsernameEl } = renderProfileHeader(user, {
-                onEdit: () => editProfileModal.open(authStore.getUser())
+                onEdit: () => editProfileModal.open()
             })
             badge = headerBadge
             nameEl = headerNameEl
