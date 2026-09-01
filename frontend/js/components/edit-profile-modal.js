@@ -25,9 +25,6 @@ export function renderEditProfileModal({ authService = defaultAuthService } = {}
     const emailGroup = document.createElement("div")
     const emailLabel = document.createElement("label")
     const emailInput = document.createElement("input")
-    const passwordGroup = document.createElement("div")
-    const passwordLabel = document.createElement("label")
-    const passwordInput = document.createElement("input")
     const error = document.createElement("p")
     const actions = document.createElement("div")
     const cancel = document.createElement("button")
@@ -65,14 +62,6 @@ export function renderEditProfileModal({ authService = defaultAuthService } = {}
     emailInput.name = "email"
     emailInput.type = "email"
     emailInput.placeholder = "Email"
-    passwordGroup.className = "form-group"
-    passwordLabel.htmlFor = "edit-profile-password"
-    passwordLabel.textContent = "New password (optional)"
-    passwordInput.id = "edit-profile-password"
-    passwordInput.className = "form-control"
-    passwordInput.name = "password"
-    passwordInput.type = "password"
-    passwordInput.placeholder = "New password (optional)"
     error.className = "form-error"
     error.hidden = true
     actions.className = "modal-actions"
@@ -106,7 +95,6 @@ export function renderEditProfileModal({ authService = defaultAuthService } = {}
         onUpdated = onUpdatedCallback || null
         nameInput.value = user.name || ""
         emailInput.value = user.email || ""
-        passwordInput.value = ""
         resetSubmitState()
         modal.hidden = false
         modal.setAttribute("aria-hidden", "false")
@@ -123,10 +111,9 @@ export function renderEditProfileModal({ authService = defaultAuthService } = {}
         const user = activeUser || {}
         const nameValue = nameInput.value.trim()
         const emailValue = emailInput.value.trim()
-        const passwordValue = passwordInput.value.trim()
         const emailChanged = emailValue !== (user.email || "")
 
-        if (nameValue === (user.name || "") && !emailChanged && !passwordValue) {
+        if (nameValue === (user.name || "") && !emailChanged) {
             closeModal()
             return
         }
@@ -135,9 +122,6 @@ export function renderEditProfileModal({ authService = defaultAuthService } = {}
         formData.append("name", nameValue)
         if (emailChanged) {
             formData.append("email", emailValue)
-        }
-        if (passwordValue) {
-            formData.append("password", passwordValue)
         }
         formData.append("_method", "PUT")
 
@@ -162,8 +146,7 @@ export function renderEditProfileModal({ authService = defaultAuthService } = {}
     actions.append(cancel, submit)
     nameGroup.append(nameLabel, nameInput)
     emailGroup.append(emailLabel, emailInput)
-    passwordGroup.append(passwordLabel, passwordInput)
-    form.append(nameGroup, emailGroup, passwordGroup, error, actions)
+    form.append(nameGroup, emailGroup, error, actions)
     panel.append(header, form)
     modal.append(panel)
     modal.open = openModal
