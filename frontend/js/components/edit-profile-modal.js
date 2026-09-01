@@ -1,10 +1,11 @@
 import authService from "/js/services/auth-service.js"
+import authStore from "/js/store/auth-store.js"
 
 function messageFor(response) {
     return response?.error?.message || "Unable to update your profile."
 }
 
-export function renderEditProfileModal({ service = authService, onSuccess, onClose } = {}) {
+export function renderEditProfileModal({ service = authService, store = authStore, onSuccess, onClose } = {}) {
     const modal = document.createElement("div")
     const panel = document.createElement("section")
     const close = document.createElement("button")
@@ -87,17 +88,31 @@ export function renderEditProfileModal({ service = authService, onSuccess, onClo
 
     form.addEventListener("submit", async (event) => {
         event.preventDefault()
-        submit.disabled = true
-        submit.textContent = "Saving..."
         error.hidden = true
 
-        const input = {
-            name: name.value.trim(),
-            username: username.value.trim()
+        const currentUser = store.getUser() || {}
+        const nextName = name.value.trim()
+        const nextUsername = username.value.trim()
+        const nextPassword = password.value.trim()
+
+        const input = {}
+        if (nextName !== (currentUser.name || "")) {
+            input.name = nextName
         }
-        if (password.value.trim()) {
-            input.password = password.value.trim()
+        if (nextUsername !== (currentUser.username || "")) {
+            input.username = nextUsername
         }
+        if (nextPassword) {
+            input.password = nextPassword
+        }
+
+        if (Object.keys(input).length === 0) {
+            closeModal()
+            return
+        }
+
+        submit.disabled = true
+        submit.textContent = "Saving..."
 
         const response = await service.updateProfile(input)
         if (response.ok) {
