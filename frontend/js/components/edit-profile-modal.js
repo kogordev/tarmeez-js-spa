@@ -11,6 +11,7 @@ export function renderEditProfileModal({ service = authService, store = authStor
     const close = document.createElement("button")
     const form = document.createElement("form")
     const heading = document.createElement("h2")
+    const name = document.createElement("input")
     const username = document.createElement("input")
     const password = document.createElement("input")
     const error = document.createElement("p")
@@ -29,6 +30,10 @@ export function renderEditProfileModal({ service = authService, store = authStor
     close.textContent = "X"
     heading.id = "edit-profile-modal-title"
     heading.textContent = "Edit profile"
+
+    name.name = "name"
+    name.placeholder = "Name"
+    name.setAttribute("dir", "auto")
 
     username.name = "username"
     username.placeholder = "Username"
@@ -69,9 +74,10 @@ export function renderEditProfileModal({ service = authService, store = authStor
         modal.hidden = false
         modal.setAttribute("aria-hidden", "false")
         resetSubmitState()
+        name.value = user?.name || user?.username || ""
         username.value = user?.username || ""
         password.value = ""
-        username.focus()
+        name.focus()
     }
 
     close.addEventListener("click", closeModal)
@@ -84,14 +90,18 @@ export function renderEditProfileModal({ service = authService, store = authStor
         error.hidden = true
 
         const currentUser = store.getUser() || {}
+        const nameVal = name.value.trim()
         const usernameVal = username.value.trim()
         const passwordVal = password.value.trim()
 
         const input = {}
-        if (usernameVal && usernameVal !== currentUser.username) {
+        if (nameVal !== currentUser.name) {
+            input.name = nameVal
+        }
+        if (usernameVal !== currentUser.username) {
             input.username = usernameVal
         }
-        if (passwordVal) {
+        if (passwordVal !== "") {
             input.password = passwordVal
         }
 
@@ -114,7 +124,7 @@ export function renderEditProfileModal({ service = authService, store = authStor
         }
     })
 
-    form.append(username, password, error, submit)
+    form.append(name, username, password, error, submit)
     panel.append(close, heading, form)
     modal.append(panel)
     modal.open = openModal
