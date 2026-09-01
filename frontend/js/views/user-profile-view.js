@@ -15,6 +15,9 @@ export function renderProfileHeader(user = {}, { onEdit } = {}) {
     const card = document.createElement("section")
     card.className = "profile-card"
 
+    const user_ = document.createElement("div")
+    user_.className = "profile-card__user"
+
     const avatar = document.createElement("img")
     avatar.className = "profile-card__avatar"
     avatar.src = getImageUrl(user.profileImageUrl, DEFAULT_AVATAR_FALLBACK)
@@ -40,17 +43,23 @@ export function renderProfileHeader(user = {}, { onEdit } = {}) {
     `
 
     info.append(name, handle, stats)
+    user_.append(avatar, info)
+    card.append(user_)
 
     if (onEdit) {
+        const actions = document.createElement("div")
+        actions.className = "profile-card__actions"
+
         const editButton = document.createElement("button")
         editButton.type = "button"
         editButton.className = "profile-card__edit-button"
         editButton.textContent = "Edit Profile"
         editButton.addEventListener("click", () => onEdit())
-        info.append(editButton)
+
+        actions.append(editButton)
+        card.append(actions)
     }
 
-    card.append(avatar, info)
     return card
 }
 
