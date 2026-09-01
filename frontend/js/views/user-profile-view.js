@@ -4,6 +4,7 @@ import { renderPostList } from "/js/components/post-list.js"
 import { renderPostCard } from "/js/components/post-card.js"
 import { renderCreatePostCard } from "/js/components/create-post-card.js"
 import { renderCreatePostModal } from "/js/components/create-post-modal.js"
+import { renderEditProfileModal } from "/js/components/edit-profile-modal.js"
 import postsService from "/js/services/posts-service.js"
 import usersService from "/js/services/users-service.js"
 import authStore from "/js/store/auth-store.js"
@@ -102,6 +103,7 @@ export function renderUserProfileView(container, { userId, navigate, userService
             load()
         }
     })
+    const editProfileModal = renderEditProfileModal()
     function openEditModal(post) {
         isEditing = Boolean(post)
         editModal.open(post)
@@ -160,7 +162,7 @@ export function renderUserProfileView(container, { userId, navigate, userService
             }
             const user = userResponse.data
             postsCount = user.postsCount ?? postsResponse.data.items.length
-            profileHeader = renderProfileHeader(user, { onEdit: isOwnProfile ? () => {} : undefined })
+            profileHeader = renderProfileHeader(user, { onEdit: isOwnProfile ? () => editProfileModal.open(user) : undefined })
             const sortedPosts = sortByNewest(postsResponse.data.items)
             postsContainer = sortedPosts.length
                 ? renderPostList(sortedPosts, {
@@ -172,7 +174,7 @@ export function renderUserProfileView(container, { userId, navigate, userService
             const content = document.createDocumentFragment()
             content.append(profileHeader)
             if (createPostCard) content.append(createPostCard)
-            content.append(postsContainer, editModal)
+            content.append(postsContainer, editModal, editProfileModal)
             container.replaceChildren(content)
         })
     }
