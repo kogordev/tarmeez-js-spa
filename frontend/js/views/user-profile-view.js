@@ -7,8 +7,39 @@ import { renderCreatePostModal } from "/js/components/create-post-modal.js"
 import postsService from "/js/services/posts-service.js"
 import usersService from "/js/services/users-service.js"
 import authStore from "/js/store/auth-store.js"
+import { DEFAULT_AVATAR_FALLBACK, getImageUrl, setImageFallback } from "/js/utils/images.js"
 
 function messageFor(response) { return response?.error?.message || "Unable to load this profile." }
+
+function renderProfileHeader(user) {
+    const header = document.createElement("div")
+    header.className = "user-profile-header"
+
+    const avatar = document.createElement("img")
+    avatar.className = "user-profile-header__avatar"
+    avatar.alt = `${user.name || user.username || "User"} profile image`
+    avatar.src = getImageUrl(user.profileImageUrl, DEFAULT_AVATAR_FALLBACK)
+    avatar.addEventListener("error", (event) => setImageFallback(event, "avatar"))
+
+    const info = document.createElement("div")
+    info.className = "user-profile-header__info"
+
+    const name = document.createElement("h1")
+    name.className = "user-profile-header__name"
+    name.textContent = user.name || user.username || "User profile"
+
+    const usernameTag = document.createElement("p")
+    usernameTag.className = "user-profile-header__username"
+    usernameTag.textContent = user.username ? `@${user.username}` : ""
+
+    const badge = document.createElement("span")
+    badge.className = "user-profile-header__badge"
+
+    info.append(name, usernameTag, badge)
+    header.append(avatar, info)
+
+    return { header, badge }
+}
 
 function sortByNewest(posts) {
     return [...posts].sort((a, b) => (Number(b.id) || 0) - (Number(a.id) || 0))
@@ -32,9 +63,8 @@ function renderEmptyPostsState() {
 
 export function renderUserProfileView(container, { userId, navigate, userService = usersService, postService = postsService } = {}) {
     let active = true
-    let username = ""
     let postsCount = 0
-    let details = null
+    let badge = null
     let postsContainer = null
     const isOwnProfile = authStore.isAuthenticated() && String(authStore.getUser()?.id) === String(userId)
     let createPostCard = null
@@ -59,8 +89,8 @@ export function renderUserProfileView(container, { userId, navigate, userService
     }
 
     function updateCounter() {
-        if (details) {
-            details.textContent = `@${username} | ${postsCount} posts`
+        if (badge) {
+            badge.textContent = `${postsCount} post${postsCount === 1 ? "" : "s"}`
         }
     }
 
@@ -106,11 +136,9 @@ export function renderUserProfileView(container, { userId, navigate, userService
                 return
             }
             const user = userResponse.data
-            username = user.username
             postsCount = user.postsCount ?? postsResponse.data.items.length
-            const heading = document.createElement("h1")
-            heading.textContent = user.name || user.username || "User profile"
-            details = document.createElement("p")
+            const { header, badge: headerBadge } = renderProfileHeader(user)
+            badge = headerBadge
             updateCounter()
             const sortedPosts = sortByNewest(postsResponse.data.items)
             postsContainer = sortedPosts.length
@@ -121,7 +149,7 @@ export function renderUserProfileView(container, { userId, navigate, userService
                 })
                 : renderEmptyPostsState()
             const content = document.createDocumentFragment()
-            content.append(heading, details)
+            content.append(header)
             if (createPostCard) content.append(createPostCard)
             content.append(postsContainer, editModal)
             container.replaceChildren(content)
