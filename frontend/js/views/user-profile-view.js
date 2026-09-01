@@ -4,6 +4,7 @@ import { renderPostList } from "/js/components/post-list.js"
 import { renderPostCard } from "/js/components/post-card.js"
 import { renderCreatePostCard } from "/js/components/create-post-card.js"
 import { renderCreatePostModal } from "/js/components/create-post-modal.js"
+import { renderEditProfileModal } from "/js/components/edit-profile-modal.js"
 import postsService from "/js/services/posts-service.js"
 import usersService from "/js/services/users-service.js"
 import authStore from "/js/store/auth-store.js"
@@ -11,7 +12,7 @@ import { DEFAULT_AVATAR_FALLBACK, getImageUrl, setImageFallback } from "/js/util
 
 function messageFor(response) { return response?.error?.message || "Unable to load this profile." }
 
-function renderProfileHeader(user) {
+function renderProfileHeader(user, { onEdit } = {}) {
     const header = document.createElement("div")
     header.className = "user-profile-header"
 
@@ -37,6 +38,15 @@ function renderProfileHeader(user) {
 
     info.append(name, usernameTag, badge)
     header.append(avatar, info)
+
+    if (onEdit) {
+        const editButton = document.createElement("button")
+        editButton.type = "button"
+        editButton.className = "user-profile-header__edit"
+        editButton.textContent = "Edit Profile"
+        editButton.addEventListener("click", onEdit)
+        header.append(editButton)
+    }
 
     return { header, badge }
 }
@@ -68,6 +78,7 @@ export function renderUserProfileView(container, { userId, navigate, userService
     let postsContainer = null
     const isOwnProfile = authStore.isAuthenticated() && String(authStore.getUser()?.id) === String(userId)
     let createPostCard = null
+    const editProfileModal = renderEditProfileModal()
     let isEditing = false
     const editModal = renderCreatePostModal({
         postService,
@@ -137,7 +148,9 @@ export function renderUserProfileView(container, { userId, navigate, userService
             }
             const user = userResponse.data
             postsCount = user.postsCount ?? postsResponse.data.items.length
-            const { header, badge: headerBadge } = renderProfileHeader(user)
+            const { header, badge: headerBadge } = renderProfileHeader(user, {
+                onEdit: isOwnProfile ? () => editProfileModal.open() : null
+            })
             badge = headerBadge
             updateCounter()
             const sortedPosts = sortByNewest(postsResponse.data.items)
@@ -151,7 +164,7 @@ export function renderUserProfileView(container, { userId, navigate, userService
             const content = document.createDocumentFragment()
             content.append(header)
             if (createPostCard) content.append(createPostCard)
-            content.append(postsContainer, editModal)
+            content.append(postsContainer, editModal, editProfileModal)
             container.replaceChildren(content)
         })
     }
