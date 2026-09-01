@@ -20,6 +20,11 @@ function getAuthData(data) {
     }
 }
 
+function extractUpdatedUser(data) {
+    const value = data?.data && typeof data.data === "object" ? data.data : data
+    return normalizeUser(value?.user || value)
+}
+
 export async function register(input) {
     return httpClient.post("/register", toFormData(input))
 }
@@ -44,5 +49,17 @@ export async function logout() {
     return response
 }
 
-export const authService = { register, login, logout }
+export async function updateProfile(input) {
+    const response = await httpClient.put("/updatePorfile", input)
+    if (response.ok) {
+        const updatedUser = extractUpdatedUser(response.data)
+        if (updatedUser) {
+            authStore.setUser({ ...authStore.getUser(), ...updatedUser })
+        }
+        return { ...response, data: { user: updatedUser } }
+    }
+    return response
+}
+
+export const authService = { register, login, logout, updateProfile }
 export default authService
