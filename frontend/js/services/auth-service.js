@@ -44,31 +44,5 @@ export async function logout() {
     return response
 }
 
-export async function updateProfile(payload) {
-    try {
-        const response = await httpClient.put("/updatePorfile", payload)
-
-        if (!response.ok) {
-            const error = response.error || { message: "Unable to update profile" }
-            console.error("Update Profile Error:", error)
-            return { success: false, error: error.message || "Unable to update profile" }
-        }
-
-        const responseData = response.data
-        const userData = responseData?.data && typeof responseData.data === "object"
-            ? responseData.data
-            : responseData
-        const updatedUser = userData && typeof userData === "object" && !Array.isArray(userData)
-            ? normalizeUser(userData)
-            : { ...authStore.getUser(), ...payload }
-
-        authStore.setUser(updatedUser)
-        return { success: true, user: updatedUser }
-    } catch (error) {
-        console.error("Update Profile Error:", error)
-        return { success: false, error: error.message || "Unable to update profile" }
-    }
-}
-
-export const authService = { register, login, logout, updateProfile }
+export const authService = { register, login, logout }
 export default authService
