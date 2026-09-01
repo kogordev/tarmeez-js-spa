@@ -39,22 +39,7 @@ export function renderProfileHeader(user = {}, { onEdit } = {}) {
     handle.className = "profile-card__handle text-muted"
     handle.textContent = `@${user.username || ""}`
 
-    const hasEmail = Boolean(user.email && user.email.trim())
-
-    const separator = document.createElement("span")
-    separator.className = `text-muted opacity-50${hasEmail ? "" : " d-none"}`
-    separator.textContent = "•"
-
-    const email = document.createElement("span")
-    email.className = `profile-email text-muted d-inline-flex align-items-center gap-1${hasEmail ? "" : " d-none"}`
-    const emailIcon = document.createElement("i")
-    emailIcon.className = "bi bi-envelope opacity-75"
-    const emailText = document.createElement("span")
-    emailText.id = "profile-email-text"
-    emailText.textContent = user.email || ""
-    email.append(emailIcon, emailText)
-
-    meta.append(handle, separator, email)
+    meta.append(handle)
 
     const stats = document.createElement("div")
     stats.className = "profile-card__stats mt-2"
@@ -143,16 +128,9 @@ export function renderUserProfileView(container, { userId, navigate, userService
         if (!profileHeader || !user) return
         const name = profileHeader.querySelector(".profile-card__name")
         const handle = profileHeader.querySelector(".profile-card__handle")
-        const emailText = profileHeader.querySelector("#profile-email-text")
-        const emailContainer = profileHeader.querySelector(".profile-email")
-        const separator = emailContainer?.previousElementSibling
         const avatar = profileHeader.querySelector(".profile-card__avatar")
-        const hasEmail = Boolean(user.email && user.email.trim())
         if (name) name.textContent = user.name || user.username || "User profile"
         if (handle) handle.textContent = `@${user.username || ""}`
-        if (emailText) emailText.textContent = user.email || ""
-        if (emailContainer) emailContainer.classList.toggle("d-none", !hasEmail)
-        if (separator) separator.classList.toggle("d-none", !hasEmail)
         if (avatar && user.profileImageUrl) {
             delete avatar.dataset.fallbackApplied
             avatar.src = getImageUrl(user.profileImageUrl, DEFAULT_AVATAR_FALLBACK)
