@@ -16,6 +16,15 @@ export function renderRegisterView(container, { navigate, service = authService 
         if (name === "password") { input.type = "password"; input.placeholder = "Password" }
         form.append(input)
     })
+    const imageLabel = document.createElement("label")
+    const imageInput = document.createElement("input")
+    imageLabel.htmlFor = "register-image"
+    imageLabel.textContent = "Profile Picture (Optional)"
+    imageInput.id = "register-image"
+    imageInput.type = "file"
+    imageInput.accept = "image/*"
+    imageInput.className = "form-control"
+    form.append(imageLabel, imageInput)
     const submit = document.createElement("button"); submit.type = "submit"; submit.textContent = "Register"
     const loginPrompt = document.createElement("p")
     const loginLink = document.createElement("a")
@@ -26,7 +35,10 @@ export function renderRegisterView(container, { navigate, service = authService 
     form.append(submit, error, loginPrompt)
     form.addEventListener("submit", async (event) => {
         event.preventDefault(); submit.disabled = true; error.textContent = ""
-        const response = await service.register(Object.fromEntries(new FormData(form)))
+        const formData = new FormData(form)
+        const file = imageInput.files[0]
+        if (file) formData.append("image", file)
+        const response = await service.register(formData)
         if (response.ok) navigate("#/login")
         else { error.replaceWith(renderErrorState(messageFor(response))); submit.disabled = false }
     })
